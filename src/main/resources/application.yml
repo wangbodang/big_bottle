@@ -1,0 +1,41 @@
+##server config
+server:
+  port: 8083
+  servlet:
+    context-path: /bigbottle
+
+
+##spring config
+spring:
+  application:
+    name: big_bottle
+  ##使用默认的hikari连接池
+  datasource:
+    ##url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=vefuture
+    username: postgres
+    password: 7241
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: HikariCP
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000      # 空闲超时时间，单位毫秒
+      connection-timeout: 30000 # 获取连接超时时间，单位毫秒
+      max-lifetime: 1800000     # 连接最大存活时间，单位毫秒
+mybatis-plus:
+  # 指定扫描 mapper 接口的包路径
+  mapper-locations: classpath*:/mapper/**/*.xml
+  # 指定实体类别名包，便于在 xml 中简化全限定类名
+  type-aliases-package: com.vefuture.**.entity
+  configuration:
+    #配置是否将下划线自动映射为驼峰命名
+    map-underscore-to-camel-case: true
+    # 输出 SQL 日志，便于调试
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 更多高级配置，可根据需要添加
+  global-config:
+    db-config:
+      id-type: auto  # 主键策略（自动增长）
+      logic-delete-value: 1  # 逻辑删除的值
+      logic-not-delete-value: 0
