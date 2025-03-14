@@ -59,4 +59,7 @@ public class Employee implements Serializable {
 
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
+
+    @TableField("email")
+    private String email;
 }
