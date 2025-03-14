@@ -1,0 +1,45 @@
+互联网上有哪些公共的REST api接口可以供大家调用，比较有名的。
+ChatGPT 说：
+互联网上有许多免费的公共 REST API 供开发者调用，涵盖各种领域，如天气、金融、翻译、娱乐等。以下是一些较为知名的公共 REST API：
+
+📌 通用数据类 API
+Public APIs - 一个收集免费公共 API 的网站。
+API List - 提供多种免费 API，涵盖不同领域。
+🌦 天气相关 API
+OpenWeatherMap - 提供全球天气数据（需要注册）。
+WeatherAPI - 免费提供天气预报、空气质量数据等。
+WeatherStack - 实时天气数据 API（免费版有调用限制）。
+🌍 地理和地图 API
+Google Maps API - 提供地图、地址解析等服务（需要 API Key）。
+OpenStreetMap - 免费地图数据 API。
+IP Geolocation API - 根据 IP 获取地理位置。
+💰 金融和加密货币 API
+CoinGecko API - 提供加密货币价格、市场数据等信息。
+Binance API - 获取币安交易所的实时数据（需注册）。
+Alpha Vantage - 提供股票、外汇、加密货币数据（免费版有限制）。
+ExchangeRate API - 提供外汇汇率转换。
+🚀 翻译和 NLP API
+Google Translate API - 谷歌翻译 API（付费）。
+LibreTranslate - 免费的翻译 API，无需 API Key。
+DeepL API - 高质量机器翻译 API（免费版有字数限制）。
+🎵 音乐和娱乐 API
+Spotify API - 提供音乐搜索、播放列表等功能（需 OAuth 认证）。
+Last.fm API - 提供音乐元数据、推荐等信息。
+The Movie Database (TMDb) - 电影数据库 API。The Movie Database （TMDb） - 电影数据库 API。
+🔍 搜索引擎和新闻 API
+Google Search API - 提供自定义搜索（需申请 Key）。
+NewsAPI - 提供全球新闻数据（免费版有限制）。
+The Guardian API - 英国《卫报》的新闻 API。
+📦 开发工具 API
+GitHub API - 获取 GitHub 代码库、Issue、用户信息等。
+JSONPlaceholder - 提供模拟 REST API 进行测试（如假用户、帖子等）。
+Reqres - 提供模拟用户数据 API，方便前端开发测试。
+📸 图像和图像处理 API
+Unsplash API - 提供免费高质量图片搜索服务。
+Pexels API - 免费的图片和视频 API。
+Lorem Picsum - 提供随机图片占位符 API。
+🔢 数学与编程相关 API
+Numbers API - 提供关于数字的趣闻 API。
+Math API - 进行数学计算的 API。
+QR Code Generator API - 生成二维码 API。
+这些 API 大多数都有免费版本，但可能需要注册 API Key 或有调用次数限制。你有特定的 API 需求吗？
