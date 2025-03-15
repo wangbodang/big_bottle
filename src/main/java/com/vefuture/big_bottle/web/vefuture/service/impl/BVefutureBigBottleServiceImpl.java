@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.exception.BusinessException;
+import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import com.vefuture.big_bottle.common.vechain.BodyEntity;
 import com.vefuture.big_bottle.common.vechain.ParameterEntity;
 import com.vefuture.big_bottle.web.vefuture.entity.*;
@@ -34,7 +35,8 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     //String token = "Bearer pat_2cG2zJt8n9T1uqNDyVJ1lUS0h3R09NetFeWHDsPoLHDPgZW94u0DKN0kgIdc48Lx"; //我的
     String token = "Bearer pat_lUnXXnZwd75NmjB5GIXtZAo6uR5rEhDziooiD2AxF9d12HFqTIFSV1uWKSRK8Bdd";  //八个大大的
     //todo 以后改为从单例class获取
-    private final OkHttpClient client = new OkHttpClient();
+    //private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = OkHttpUtil.getClient();
 
     /**
      *
