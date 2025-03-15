@@ -1,7 +1,9 @@
 package com.vefuture.big_bottle.web.vefuture.service;
 
+import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.vefuture.big_bottle.web.vefuture.entity.ReqBigBottleVo;
 
 /**
  * <p>
@@ -13,4 +15,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface BVefutureBigBottleService extends IService<BVefutureBigBottle> {
 
+    /**
+     *
+     *
+     * @param  vo 前端数据
+     * @return  返回值说明
+     */
+
+    ApiResponse processReceipt(ReqBigBottleVo vo);
 }

@@ -1,11 +1,12 @@
 package com.vefuture.big_bottle.web.vefuture.controller;
 
+import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.domain.RetResponse;
 import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
+import com.vefuture.big_bottle.web.vefuture.entity.ReqBigBottleVo;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,7 +51,18 @@ public class BVefutureBigBottleController {
         } catch (Exception e) {
             throw new BusinessException(2, "异常", e);
         }
+    }
 
-
+    /**
+     *
+     *
+     * @param  vo 前端VO
+     * @return  返回值说明
+     */
+    @RequestMapping(value = "/receipt", method = RequestMethod.POST)
+    public ApiResponse processReceipt(ReqBigBottleVo vo){
+        log.info("---> 传过来的数据为:{}", vo);
+        ApiResponse apiResponse = apiResponse = bigBottleService.processReceipt(vo);
+        return apiResponse;
     }
 }

@@ -1,8 +1,8 @@
 package com.vechain;
 
 import com.alibaba.fastjson.JSON;
-import com.vechain.entity.BodyEntity;
-import com.vechain.entity.ParameterEntity;
+import com.vefuture.big_bottle.common.vechain.BodyEntity;
+import com.vefuture.big_bottle.common.vechain.ParameterEntity;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 @Slf4j
 public class CozeClientTest {
-    private final OkHttpClient client = new OkHttpClient();;
+    private final OkHttpClient client = new OkHttpClient();
 
     @Test
     public void test01() throws IOException {
