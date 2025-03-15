@@ -35,7 +35,7 @@ public class AutoGenerator_PostgreSQL {
 
         //表名集合
         List<String> tables = new ArrayList<>();
-        tables.add("employee");
+        tables.add("b_vefuture_big_bottle");
         //tables.add("dne_commencement_settlement_ds");
         //tables.add("dne_initial_design_ds");
 
@@ -100,8 +100,8 @@ public class AutoGenerator_PostgreSQL {
                 })
                 //包配置
                 .packageConfig(builder -> {
-                    builder.parent("com.vefuture.big_bottle.web.employee")     //父包名
-                            .moduleName("employee") // 设置父包模块名，这里一般不设置
+                    builder.parent("com.vefuture.big_bottle.web")     //父包名
+                            .moduleName("vefuture") // 设置父包模块名，这里一般不设置
                             .entity("entity")                 //Entity 包名
                             .service("service")             //	Service 包名
                             .serviceImpl("service.impl")    //Service Impl 包名
