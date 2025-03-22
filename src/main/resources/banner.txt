@@ -12,4 +12,10 @@
 Version :: ${app.version}
 Group   :: ${app.groupId}
 
+Build Time  :: ${git.build.time}
+Git Branch  :: ${git.branch}
+Git Commit  :: ${git.commit.id.abbrev}
+
+Build Time  :: ${build.time}
+
 ******************************************

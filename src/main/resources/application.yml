@@ -8,6 +8,9 @@ app:
   name: @project.name@
   version: @project.version@
   groupId: @project.groupId@
+build:
+  time: '@build.timestamp@'
+
 ##spring config
 spring:
   application:

@@ -219,6 +219,55 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.4.0</version>
+
+                <executions>
+
+                    <!-- Execution 1: 添加构建时间 -->
+                    <execution>
+                        <id>add-timestamp</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                                <!--<timestampPropertyName>build.timestamp</timestampPropertyName>
+                                <timestampFormat>yyyy-MM-dd HH:mm:ss</timestampFormat>-->
+                            <name>build.timestamp</name> <!-- ✅ 必须是 name -->
+                            <pattern>yyyy-MM-dd HH:mm:ss</pattern> <!-- ✅ 使用 pattern -->
+                        </configuration>
+                    </execution>
+
+                    <!-- Execution 2: 可选：解析版本（避免与 timestamp 冲突） -->
+                    <!--
+                    <execution>
+                        <id>parse-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                    </execution>
+                    -->
+
+                </executions>
+            </plugin>
+
+
+
         </plugins>
     </build>
 
