@@ -2,6 +2,7 @@ package com.vefuture.big_bottle.web.vefuture.controller;
 
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.domain.RetResponse;
+import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.ReqBigBottleVo;
@@ -46,10 +47,13 @@ public class BVefutureBigBottleController {
                 RetResponse<BVefutureBigBottle> retResponse = new RetResponse<>(1, "保存成功", bigBottle);
                 return retResponse;
             }else{
-                return new RetResponse<>(1, "插入失败");
+                log.error("===> 保存失败");
+                return new RetResponse<>(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage());
             }
         } catch (Exception e) {
-            throw new BusinessException(2, "异常", e);
+            e.printStackTrace();
+            log.error("===> 异常消息:{}", e.getMessage());
+            throw new BusinessException(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage(), e);
         }
     }
 

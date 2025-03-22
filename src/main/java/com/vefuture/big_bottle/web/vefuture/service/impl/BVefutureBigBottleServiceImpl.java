@@ -3,6 +3,7 @@ package com.vefuture.big_bottle.web.vefuture.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
+import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import com.vefuture.big_bottle.common.vechain.BodyEntity;
@@ -83,15 +84,16 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
 
             if(!bigBottle.getRetinfoIsAvaild()){
                 log.info("---> 该票据信息不完整");
-                return ApiResponse.error(403, "该小票相关信息不完整");
+                return ApiResponse.error(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
             }
 
             //todo 存到数据库
             saveToDb(walletAddress, imgUrl, bigBottle);
         } catch (IOException e) {
             //throw new BusinessException(430, "业务异常:"+e.getMessage(), e);
-            e.getMessage();
-            return ApiResponse.error(403, "业务异常:"+e.getMessage());
+            e.printStackTrace();
+            log.error("===> 业务异常:{}", e.getMessage());
+            return ApiResponse.error(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage());
         }
         return ApiResponse.success();
     }

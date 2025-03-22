@@ -12,7 +12,9 @@ public enum ResultCode {
     FORBIDDEN(403, "禁止访问"),
     NOT_FOUND(404, "资源未找到"),
     INTERNAL_ERROR(500, "服务器内部错误"),
-    SERVICE_UNAVAILABLE(503, "服务不可用");
+    SERVICE_UNAVAILABLE(503, "服务不可用"),
+
+    RECEIPT_ERR_UNAVAILABLE(301, "该小票相关信息不完整");
 
     private final int code;
     private final String message;
