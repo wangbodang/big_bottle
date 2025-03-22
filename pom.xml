@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.vefuture</groupId>
     <artifactId>big_bottle</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>big_bottle</name>
     <description>big_bottle</description>
     <url/>
@@ -28,6 +28,11 @@
     </scm>
     <properties>
         <java.version>1.8</java.version>
+        <spring-boot.version>${parent.version}</spring-boot.version>
+        <project.name>${project.name}</project.name>
+        <project.artifactId>${project.artifactId}</project.artifactId>
+        <project.version>${project.version}</project.version>
+        <project.groupId>${project.groupId}</project.groupId>
     </properties>
     <dependencies>
         <dependency>
@@ -50,6 +55,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -97,10 +104,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
         </dependency>
 
         <dependency>
@@ -175,6 +178,12 @@
     </dependencyManagement>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -188,16 +197,24 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
+                            <!--<version>1.18.30</version>-->
                         </exclude>
                     </excludes>
                 </configuration>

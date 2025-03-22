@@ -4,7 +4,10 @@ server:
   servlet:
     context-path: /bigbottle
 
-
+app:
+  name: @project.name@
+  version: @project.version@
+  groupId: @project.groupId@
 ##spring config
 spring:
   application:
