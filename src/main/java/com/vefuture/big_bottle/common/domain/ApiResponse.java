@@ -5,6 +5,7 @@ package com.vefuture.big_bottle.common.domain;
  * @date 2025/3/15
  * @description TODO: 类描述
  */
+import com.vefuture.big_bottle.common.enums.ResultCode;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -30,12 +31,12 @@ public class ApiResponse<T> implements Serializable {
 
     // 快捷返回成功结果
     public static <T> ApiResponse<T> success() {
-        return new ApiResponse<>(200, "Success", null);
+        return new ApiResponse<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), null);
     }
 
     // 快捷返回成功结果
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(200, "Success", data);
+        return new ApiResponse<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);
     }
 
     // 快捷返回错误结果
