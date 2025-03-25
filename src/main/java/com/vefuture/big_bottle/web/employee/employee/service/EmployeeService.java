@@ -1,7 +1,10 @@
 package com.vefuture.big_bottle.web.employee.employee.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.web.employee.employee.entity.Employee;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.vefuture.big_bottle.web.employee.employee.entity.EmployeeQuery;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface EmployeeService extends IService<Employee> {
 
+    ApiResponse<IPage<Employee>> getEmpPageData(Integer pageNo, Integer pageSize, EmployeeQuery empParam);
 }

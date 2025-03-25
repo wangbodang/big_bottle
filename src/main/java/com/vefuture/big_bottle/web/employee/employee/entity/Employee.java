@@ -34,7 +34,7 @@ public class Employee implements Serializable {
     private String name;
 
     @TableField("age")
-    private Short age;
+    private Integer age;
 
     @TableField("gender")
     private String gender;
@@ -62,4 +62,7 @@ public class Employee implements Serializable {
 
     @TableField("email")
     private String email;
+
+    @TableField("roles")
+    private String roles;
 }

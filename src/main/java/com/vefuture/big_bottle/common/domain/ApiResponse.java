@@ -34,6 +34,10 @@ public class ApiResponse<T> implements Serializable {
         return new ApiResponse<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), null);
     }
 
+    public static <T> ApiResponse<T> success(Integer code, String msg, T data) {
+        return new ApiResponse<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);
+    }
+
     // 快捷返回成功结果
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);

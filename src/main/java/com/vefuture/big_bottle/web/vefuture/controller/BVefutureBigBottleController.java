@@ -37,18 +37,18 @@ public class BVefutureBigBottleController {
      */
     @RequestMapping(value = "", method = RequestMethod.POST)
     //public RetResponse<BVefutureBigBottle> saveBigBottle(@RequestBody BVefutureBigBottle bigBottle){
-    public RetResponse<BVefutureBigBottle> saveBigBottle(BVefutureBigBottle bigBottle){
+    public ApiResponse<BVefutureBigBottle> saveBigBottle(BVefutureBigBottle bigBottle){
         log.info("---> 前端传过来的数据:{}", bigBottle);
         boolean save = false;
         try {
             save = bigBottleService.save(bigBottle);
             if (save) {
                 log.info("---> 保存成功");
-                RetResponse<BVefutureBigBottle> retResponse = new RetResponse<>(1, "保存成功", bigBottle);
+                ApiResponse<BVefutureBigBottle> retResponse = ApiResponse.success(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), bigBottle);
                 return retResponse;
             }else{
                 log.error("===> 保存失败");
-                return new RetResponse<>(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage());
+                return ApiResponse.error(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();
