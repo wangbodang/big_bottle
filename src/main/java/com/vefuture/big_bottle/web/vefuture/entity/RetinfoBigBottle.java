@@ -25,6 +25,8 @@ public class RetinfoBigBottle {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo") //返回到前端时默认格式
     @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date retinfoReceiptTime;
+    //布尔值，用来检验小票时间和上传到系统时间的差值（比如我们规定小票时间是本周内的，就需要做这个判断）
+    private Boolean timeThreshold;
     //饮料列表
     private ArrayList<RetinfoDrink> drinkList = new ArrayList<>();
 }

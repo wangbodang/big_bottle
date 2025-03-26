@@ -2,6 +2,7 @@ package com.vefuture.big_bottle.web.vefuture.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.vefuture.big_bottle.common.config.BigBottleProperties;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BusinessException;
@@ -14,6 +15,7 @@ import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -30,12 +32,19 @@ import java.util.ArrayList;
 @Slf4j
 @Service
 public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottleMapper, BVefutureBigBottle> implements BVefutureBigBottleService {
-    //todo 改为配置
-    String cozeUrl = "https://api.coze.com/v1/workflow/run";
-    //todo 改为配置
+
+    @Autowired
+    private BigBottleProperties bigBottleProperties;
+
+    //改为配置
+    //String cozeUrl = "https://api.coze.com/v1/workflow/run";
+    //String workflow_id = "7480478548415840263"; //我的
+    //String workflow_id = "7480934802444992567"; //八个大大的
+    //String workflow_id = "7482017874254037010"; //八个大大的更详细的模型
+    //改为配置
     //String token = "Bearer pat_2cG2zJt8n9T1uqNDyVJ1lUS0h3R09NetFeWHDsPoLHDPgZW94u0DKN0kgIdc48Lx"; //我的
-    String token = "Bearer pat_lUnXXnZwd75NmjB5GIXtZAo6uR5rEhDziooiD2AxF9d12HFqTIFSV1uWKSRK8Bdd";  //八个大大的
-    //todo 以后改为从单例class获取
+    //String token = "Bearer pat_lUnXXnZwd75NmjB5GIXtZAo6uR5rEhDziooiD2AxF9d12HFqTIFSV1uWKSRK8Bdd";  //八个大大的
+    //从单例class获取
     //private final OkHttpClient client = new OkHttpClient();
     private final OkHttpClient client = OkHttpUtil.getClient();
 
@@ -55,6 +64,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         ParameterEntity parameterEntity = new ParameterEntity();
         parameterEntity.setImg_url(imgUrl);
         BodyEntity bodyEntity = new BodyEntity();
+        bodyEntity.setWorkflow_id(bigBottleProperties.getCoze_workflow_id());
         bodyEntity.setParameters(parameterEntity);
 
         // 3. 使用 Gson（或 Jackson 等）将实体转换为 JSON 字符串
@@ -65,9 +75,9 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
 
         try {
             Request request = new Request.Builder()
-                    .header("Authorization", token)
+                    .header("Authorization", bigBottleProperties.getCoze_token())
                     .header("Content-Type", "application/json")
-                    .url(cozeUrl)
+                    .url(bigBottleProperties.getCoze_url())
                     .post(body)
                     .build();
 
@@ -109,6 +119,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
             bigBottle.setImgUrl(imgUrl);
             bigBottle.setRetinfoIsAvaild(retinfoBigBottle.getRetinfoIsAvaild());
             bigBottle.setRetinfoReceiptTime(retinfoBigBottle.getRetinfoReceiptTime());
+            bigBottle.setIsTimeThreshold(retinfoBigBottle.getTimeThreshold());
             //饮料信息
             bigBottle.setRetinfoDrinkName(drink.getRetinfoDrinkName());
             bigBottle.setRetinfoDrinkCapacity(drink.getRetinfoDrinkCapacity());

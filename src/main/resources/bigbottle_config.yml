@@ -1,0 +1,8 @@
+
+###配置coze模型参数
+
+bigbottle:
+  coze:
+    coze_url: https://api.coze.com/v1/workflow/run
+    coze_workflow_id: 7482017874254037010  #可用的
+    coze_token: Bearer pat_lUnXXnZwd75NmjB5GIXtZAo6uR5rEhDziooiD2AxF9d12HFqTIFSV1uWKSRK8Bdd

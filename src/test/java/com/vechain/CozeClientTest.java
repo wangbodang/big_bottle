@@ -1,24 +1,44 @@
 package com.vechain;
 
+import cn.hutool.core.date.StopWatch;
 import com.alibaba.fastjson.JSON;
+import com.vefuture.big_bottle.BigBottleApplication;
 import com.vefuture.big_bottle.common.vechain.BodyEntity;
 import com.vefuture.big_bottle.common.vechain.ParameterEntity;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 测试Coze模型调用判断图片
  */
 @Slf4j
+//@SpringBootTest(classes = BigBottleApplication.class)
+//@RunWith(SpringRunner.class)
 public class CozeClientTest {
     private final OkHttpClient client = new OkHttpClient();
 
+    String cozeUrl = "https://api.coze.com/v1/workflow/run";
+    //String workflow_id = "7480478548415840263"; //我的
+    //String workflow_id = "7480934802444992567"; //八个大大的
+    String workflow_id = "7482017874254037010"; //八个大大的更详细的模型
+    //String workflow_id = "7484704441888489480"; //八个大大的更详细的模型
+    //String workflow_id = "7485935567689302034"; //八个大大的更详细的模型
+
+    //String token = "Bearer pat_2cG2zJt8n9T1uqNDyVJ1lUS0h3R09NetFeWHDsPoLHDPgZW94u0DKN0kgIdc48Lx"; //我的
+    String token = "Bearer pat_lUnXXnZwd75NmjB5GIXtZAo6uR5rEhDziooiD2AxF9d12HFqTIFSV1uWKSRK8Bdd";  //八个大大的
+
     @Test
     public void test01() throws IOException {
+
+
         //封装请求参数
         //返回true的数据
         //String img_url = "https://victor-oss.oss-cn-shanghai.aliyuncs.com/uPic/CleanShot%202025-03-09%20at%2023.41.50@2x.png";
@@ -31,11 +51,17 @@ public class CozeClientTest {
         //String img_url = "https://bvefuturebigbottle.s3.ap-southeast-2.amazonaws.com/bill3.jpg";
         //String img_url = "https://bvefuturebigbottle.s3.ap-southeast-2.amazonaws.com/demo.png";
         //String img_url = "https://bvefuturebigbottle.s3.ap-southeast-2.amazonaws.com/uploads/_MG_1445_3k.jpg";
+
+        //一瓶饮料
         String img_url = "https://bvefuturebigbottle.s3.ap-southeast-2.amazonaws.com/uploads/xxxx.png";
+        //两瓶饮料
+        //String img_url = "https://victor-oss.oss-cn-shanghai.aliyuncs.com/uPic/CleanShot 2025-03-15 at 21.14.01@2x.png"
+
 
         ParameterEntity parameterEntity = new ParameterEntity();
         parameterEntity.setImg_url(img_url);
         BodyEntity bodyEntity = new BodyEntity();
+        bodyEntity.setWorkflow_id(workflow_id);
         bodyEntity.setParameters(parameterEntity);
         Object bodyEntityJson = JSON.toJSON(bodyEntity);
         // 3. 使用 Gson（或 Jackson 等）将实体转换为 JSON 字符串
@@ -44,9 +70,10 @@ public class CozeClientTest {
         // 4. 将 JSON 字符串封装为 RequestBody
         RequestBody body = RequestBody.create(jsonString, MediaType.get("application/json; charset=utf-8"));
 
-        String cozeUrl = "https://api.coze.com/v1/workflow/run";
 
-        String token = "Bearer pat_2cG2zJt8n9T1uqNDyVJ1lUS0h3R09NetFeWHDsPoLHDPgZW94u0DKN0kgIdc48Lx";
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         Request request = new Request.Builder()
                 .header("Authorization", token)
                 .header("Content-Type", "application/json")
@@ -55,7 +82,8 @@ public class CozeClientTest {
                 .build();
 
         Response response = client.newCall(request).execute();
-
+        stopWatch.stop();
+        log.info("---> 调用Coze模型耗时:{}秒", stopWatch.prettyPrint(TimeUnit.SECONDS));
         log.info("---> 返回值为:{}", response.body().string());
 
     }

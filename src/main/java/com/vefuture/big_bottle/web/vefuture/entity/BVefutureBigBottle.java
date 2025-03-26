@@ -51,6 +51,12 @@ public class BVefutureBigBottle implements Serializable {
     private Boolean retinfoIsAvaild;
 
     /**
+     * 布尔值，用来检验小票时间和上传到系统时间的差值（比如我们规定小票时间是本周内的，就需要做这个判断）
+     */
+    @TableField("is_time_threshold")
+    private Boolean isTimeThreshold;
+
+    /**
      * 饮料名称
      */
     @TableField("retinfo_drink_name")

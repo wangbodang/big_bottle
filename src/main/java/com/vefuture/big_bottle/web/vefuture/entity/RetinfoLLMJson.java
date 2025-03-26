@@ -11,6 +11,7 @@ import lombok.Data;
 public class RetinfoLLMJson {
     private Integer code;
     private String cost;
+    //返回的饮料消息字符串
     private String data;
     private String debug_url;
     private String  msg;

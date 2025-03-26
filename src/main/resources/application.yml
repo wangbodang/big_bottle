@@ -15,6 +15,11 @@ build:
 spring:
   application:
     name: big_bottle
+  ##引入其他配置类
+  config:
+    import:
+      - classpath:bigbottle_config.yml
+      - classpath:other_config.yml
   ##使用默认的hikari连接池
   datasource:
     ##url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
