@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -134,13 +135,20 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         return 0;
     }
 
-    private Integer getPoints(Integer capacity) {
+    /*
+    * 如果两个都是true， 其他信息都有 但是饮料容积拿不到的时候 积分用第一条规则
+    */
+    private Integer getPoints(BVefutureBigBottle bigBottle) {
+        Integer capacity = bigBottle.getRetinfoDrinkCapacity();
+        if(ObjectUtil.isEmpty(capacity) && ObjectUtil.isNotEmpty(bigBottle.getRetinfoDrinkName()) && ObjectUtil.isNotEmpty(bigBottle.getRetinfoDrinkAmout())){
+            return bigBottle.getRetinfoDrinkAmout() * (Integer) 1;
+        }
         if(capacity < 1000)
-            return 1;
+            return bigBottle.getRetinfoDrinkAmout() * (Integer) 1;
         if(capacity <= 2000)
-            return 5;
+            return bigBottle.getRetinfoDrinkAmout() * (Integer) 5;
         if(capacity > 2000)
-            return 7;
+            return bigBottle.getRetinfoDrinkAmout() * (Integer) 7;
         return 0;
     }
 
@@ -159,7 +167,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     
     private Integer getPointsByReceipts(List<BVefutureBigBottle> bigBottles) {
         Integer sumPoint = bigBottles.stream()
-                .mapToInt(bigBottle -> bigBottle.getRetinfoDrinkAmout() * getPoints(bigBottle.getRetinfoDrinkCapacity()))
+                .mapToInt(this::getPoints)
                 .sum();
         return sumPoint;
     }
