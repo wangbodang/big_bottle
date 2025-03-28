@@ -1,4 +1,4 @@
-package com.vefuture.big_bottle.web.vefuture.entity;
+package com.vefuture.big_bottle.web.vefuture.entity.llm_ret;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;

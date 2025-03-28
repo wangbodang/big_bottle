@@ -1,11 +1,11 @@
 package com.vefuture.big_bottle.web.vefuture.controller;
 
 import com.vefuture.big_bottle.common.domain.ApiResponse;
-import com.vefuture.big_bottle.common.domain.RetResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
-import com.vefuture.big_bottle.web.vefuture.entity.ReqBigBottleVo;
+import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
+import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +29,32 @@ public class BVefutureBigBottleController {
 
     @Resource
     private BVefutureBigBottleService bigBottleService;
+
+
+    /**
+     *
+     * 获取标签页的内容
+     * @param  qo 请求参数
+     * @return
+     */
+    @RequestMapping(value = "/cardinfo", method = RequestMethod.POST)
+    public ApiResponse<CardInfoVo> getCardInfo(ReqBigBottleQo qo){
+        log.info("---> 请求card_info时的钱包地址为:[{}]", qo.getWalletAddress());
+        ApiResponse<CardInfoVo> cardInfo = bigBottleService.getCardInfoByWalletAddress(qo);
+        return cardInfo;
+    }
+    /**
+     * 前端发送
+     *
+     * @param  vo 前端VO
+     * @return  返回值说明
+     */
+    @RequestMapping(value = "/receipt", method = RequestMethod.POST)
+    public ApiResponse processReceipt(ReqBigBottleQo vo){
+        log.info("---> 传过来的数据为:{}", vo);
+        ApiResponse apiResponse = apiResponse = bigBottleService.processReceipt(vo);
+        return apiResponse;
+    }
 
     /**
      * 保存到数据库
@@ -57,16 +83,4 @@ public class BVefutureBigBottleController {
         }
     }
 
-    /**
-     *
-     *
-     * @param  vo 前端VO
-     * @return  返回值说明
-     */
-    @RequestMapping(value = "/receipt", method = RequestMethod.POST)
-    public ApiResponse processReceipt(ReqBigBottleVo vo){
-        log.info("---> 传过来的数据为:{}", vo);
-        ApiResponse apiResponse = apiResponse = bigBottleService.processReceipt(vo);
-        return apiResponse;
-    }
 }

@@ -1,4 +1,4 @@
-package com.vefuture.big_bottle.web.vefuture.entity;
+package com.vefuture.big_bottle.web.vefuture.entity.qo;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @description 前端请求接收VO
  */
 @Data
-public class ReqBigBottleVo {
+public class ReqBigBottleQo {
 
     //ve链钱包地址
     private String walletAddress;

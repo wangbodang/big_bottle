@@ -1,13 +1,12 @@
 package com.tool.format;
 
 import com.alibaba.fastjson.JSON;
-import com.vefuture.big_bottle.web.vefuture.entity.RetinfoBigBottle;
-import com.vefuture.big_bottle.web.vefuture.entity.RetinfoDrink;
+import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoBigBottle;
+import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoDrink;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author wangb

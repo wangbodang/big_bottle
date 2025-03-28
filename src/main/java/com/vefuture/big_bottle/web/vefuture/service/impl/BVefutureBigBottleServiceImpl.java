@@ -1,14 +1,26 @@
 package com.vefuture.big_bottle.web.vefuture.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.vefuture.big_bottle.common.config.BigBottleProperties;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
+import com.vefuture.big_bottle.common.util.BbDateTimeUtils;
 import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import com.vefuture.big_bottle.common.vechain.BodyEntity;
 import com.vefuture.big_bottle.common.vechain.ParameterEntity;
 import com.vefuture.big_bottle.web.vefuture.entity.*;
+import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
+import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoBigBottle;
+import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoDrink;
+import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoLLMJson;
+import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * <p>
@@ -52,16 +64,121 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
 
     /**
      *
+     * 显示的是最后一次上传的小票内容和本周的积分
+     - icon 展示  状态
+     - 右下角时间显示后端数据库记录的时间
+     - 饮料名称（UI 做最大字符串的截断处理或多行设计）
+     - 饮料容积，以 ml 作为单位
+     - 饮料数量
+     - 积分 = {
+                 1, 如果 数量 < 1000
+                 5, 如果 1000 ≤ 数量 ≤ 2000
+                 7, 如果 数量 > 2000
+             }
+     算出本周内的积分
+     找出最后一次上传小票的时间
+
+     失败：
+     - icon 展示 false状态
+     - 提示文字 “Your receipt doesn't meet the requirements”
+     - 时间显示后端数据库记录的时间
+
+     * @param  qo 包含钱包地址
+     * @return  返回值说明
+     */
+    @Override
+    public ApiResponse<CardInfoVo> getCardInfoByWalletAddress(ReqBigBottleQo qo) {
+        //钱包地址
+        String walletAddress = qo.getWalletAddress();
+        //当前本地时间
+        LocalDateTime now = LocalDateTime.now();
+        // 算出本周内的积分
+        // 找出最后一次上传小票的时间
+        LambdaQueryWrapper<BVefutureBigBottle> queryWrapper = new LambdaQueryWrapper<>();
+        //钱包地址，返回信息是可用的，是否超期可用
+        queryWrapper.eq(BVefutureBigBottle::getWalletAddress, walletAddress);
+        //此时先把所有的数据都查出来
+        //queryWrapper.eq(BVefutureBigBottle::getRetinfoIsAvaild, true);
+        //queryWrapper.eq(BVefutureBigBottle::getIsTimeThreshold, true);
+
+        //限制插入时间为本周的开始
+        Date currentTime = BbDateTimeUtils.localDateTimeToDate(now);
+        DateTime beginOfWeek = DateUtil.beginOfWeek(BbDateTimeUtils.localDateTimeToDate(now));
+        queryWrapper.ge(BVefutureBigBottle::getCreateTime, beginOfWeek);
+        queryWrapper.le(BVefutureBigBottle::getCreateTime, currentTime);
+
+        //按id排序
+        queryWrapper.orderByDesc(BVefutureBigBottle::getId);
+
+        List<BVefutureBigBottle> bigBottles = baseMapper.selectList(queryWrapper);
+        if(CollectionUtil.isEmpty(bigBottles)){
+            log.info("---> 钱包地址[{}]本周内没有合适的小票", walletAddress);
+            return ApiResponse.error(ResultCode.RECEIPT_ERR_UNMEET.getCode(), ResultCode.RECEIPT_ERR_UNMEET.getMessage());
+        }
+        BVefutureBigBottle bigBottleLast = bigBottles.get(0);
+
+        CardInfoVo cardInfoVo = new CardInfoVo();
+        cardInfoVo.setDrinkName(bigBottleLast.getRetinfoDrinkName());
+        cardInfoVo.setDrinkAmout(bigBottleLast.getRetinfoDrinkAmout());
+        cardInfoVo.setDrinkCapacity(bigBottleLast.getRetinfoDrinkCapacity());
+
+        //设定积分
+        cardInfoVo.setPoints(getPointsByReceipts(new ArrayList<>(Arrays.asList(bigBottleLast))));
+        //cardInfoVo.setPoints(getPointsByReceipt(bigBottleLast));
+
+        ApiResponse<CardInfoVo> success = ApiResponse.success(cardInfoVo);
+        return success;
+    }
+
+    private Integer getPointsByReceipt(BVefutureBigBottle bigBottleLast) {
+        return 0;
+    }
+
+    private Integer getPoints(Integer capacity) {
+        if(capacity < 1000)
+            return 1;
+        if(capacity <= 2000)
+            return 5;
+        if(capacity > 2000)
+            return 7;
+        return 0;
+    }
+
+
+    /**
+     * 根据饮料信息返回积分
+     * - 积分 = {
+     *                  1, 如果 数量 < 1000
+     *                  5, 如果 1000 ≤ 数量 ≤ 2000
+     *                  7, 如果 数量 > 2000
+     *              }
+     * 
+     * @param  
+     * @return  返回值说明
+     */
+    
+    private Integer getPointsByReceipts(List<BVefutureBigBottle> bigBottles) {
+        Integer sumPoint = bigBottles.stream()
+                .mapToInt(bigBottle -> bigBottle.getRetinfoDrinkAmout() * getPoints(bigBottle.getRetinfoDrinkCapacity()))
+                .sum();
+        return sumPoint;
+    }
+
+    /**
+     *
      * @param  bigBottleVo
      * @return  返回值说明
      */
     @Override
-    public ApiResponse processReceipt(ReqBigBottleVo bigBottleVo) {
+    public ApiResponse processReceipt(ReqBigBottleQo bigBottleVo) {
 
         //钱包地址和图片地址
         String walletAddress = bigBottleVo.getWalletAddress();
         String imgUrl = bigBottleVo.getImgUrl();
-
+        if(StrUtil.isBlank(walletAddress) || StrUtil.isBlank(imgUrl)){
+            log.info("---> 缺失参数 walletAddress imgUrl都不能为空");
+            return ApiResponse.error(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(), ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
+        }
         //构造请求参数
         ParameterEntity parameterEntity = new ParameterEntity();
         parameterEntity.setImg_url(imgUrl);

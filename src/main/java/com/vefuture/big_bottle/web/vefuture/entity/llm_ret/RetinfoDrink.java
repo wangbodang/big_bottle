@@ -1,4 +1,4 @@
-package com.vefuture.big_bottle.web.vefuture.entity;
+package com.vefuture.big_bottle.web.vefuture.entity.llm_ret;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
