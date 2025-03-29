@@ -8,6 +8,7 @@ import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,8 +39,8 @@ public class BVefutureBigBottleController {
      * @return
      */
     @RequestMapping(value = "/cardinfo", method = RequestMethod.POST)
-    public ApiResponse<CardInfoVo> getCardInfo(ReqBigBottleQo qo){
-        log.info("---> 请求card_info时的钱包地址为:[{}]", qo.getWallet_address());
+    public ApiResponse<CardInfoVo> getCardInfo(@RequestBody ReqBigBottleQo qo){
+        log.info("---> 请求card_info时的钱包地址为:[{}]", qo.getWalletAddress());
         ApiResponse<CardInfoVo> cardInfo = bigBottleService.getCardInfoByWalletAddress(qo);
         return cardInfo;
     }
@@ -50,7 +51,7 @@ public class BVefutureBigBottleController {
      * @return  返回值说明
      */
     @RequestMapping(value = "/process", method = RequestMethod.POST)
-    public ApiResponse processReceipt(ReqBigBottleQo vo){
+    public ApiResponse processReceipt(@RequestBody ReqBigBottleQo vo){
         log.info("---> 传过来的数据为:{}", vo);
         ApiResponse apiResponse = apiResponse = bigBottleService.processReceipt(vo);
         return apiResponse;

@@ -89,7 +89,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     @Override
     public ApiResponse<CardInfoVo> getCardInfoByWalletAddress(ReqBigBottleQo qo) {
         //钱包地址
-        String walletAddress = qo.getWallet_address();
+        String walletAddress = qo.getWalletAddress();
         //当前本地时间
         LocalDateTime now = LocalDateTime.now();
         // 算出本周内的积分
@@ -180,8 +180,8 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     public ApiResponse processReceipt(ReqBigBottleQo bigBottleVo) {
 
         //钱包地址和图片地址
-        String walletAddress = bigBottleVo.getWallet_address();
-        String imgUrl = bigBottleVo.getImg_url();
+        String walletAddress = bigBottleVo.getWalletAddress();
+        String imgUrl = bigBottleVo.getImgUrl();
         if(StrUtil.isBlank(walletAddress) || StrUtil.isBlank(imgUrl)){
             log.info("---> 缺失参数 walletAddress imgUrl都不能为空");
             return ApiResponse.error(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(), ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());

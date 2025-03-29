@@ -15,7 +15,7 @@ import lombok.Data;
 public class ReqBigBottleQo {
 
     //ve链钱包地址
-    private String wallet_address;
+    private String walletAddress;
     //图片地址
-    private String img_url;
+    private String imgUrl;
 }
