@@ -24,7 +24,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping("/vefuture/bigbottle")
+//@RequestMapping("/vefuture/bigbottle")
 public class BVefutureBigBottleController {
 
     @Resource
@@ -39,7 +39,7 @@ public class BVefutureBigBottleController {
      */
     @RequestMapping(value = "/cardinfo", method = RequestMethod.POST)
     public ApiResponse<CardInfoVo> getCardInfo(ReqBigBottleQo qo){
-        log.info("---> 请求card_info时的钱包地址为:[{}]", qo.getWalletAddress());
+        log.info("---> 请求card_info时的钱包地址为:[{}]", qo.getWallet_address());
         ApiResponse<CardInfoVo> cardInfo = bigBottleService.getCardInfoByWalletAddress(qo);
         return cardInfo;
     }
@@ -49,7 +49,7 @@ public class BVefutureBigBottleController {
      * @param  vo 前端VO
      * @return  返回值说明
      */
-    @RequestMapping(value = "/receipt", method = RequestMethod.POST)
+    @RequestMapping(value = "/process", method = RequestMethod.POST)
     public ApiResponse processReceipt(ReqBigBottleQo vo){
         log.info("---> 传过来的数据为:{}", vo);
         ApiResponse apiResponse = apiResponse = bigBottleService.processReceipt(vo);

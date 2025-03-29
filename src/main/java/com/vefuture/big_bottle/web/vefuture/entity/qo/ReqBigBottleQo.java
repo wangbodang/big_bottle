@@ -1,5 +1,9 @@
 package com.vefuture.big_bottle.web.vefuture.entity.qo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 /**
@@ -11,7 +15,7 @@ import lombok.Data;
 public class ReqBigBottleQo {
 
     //ve链钱包地址
-    private String walletAddress;
+    private String wallet_address;
     //图片地址
-    private String imgUrl;
+    private String img_url;
 }
