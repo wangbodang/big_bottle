@@ -2,6 +2,9 @@ package com.vefuture.big_bottle.web.auth.controller;
 
 
 // UserController.java
+import com.vefuture.big_bottle.common.annotation.RequireRole;
+import com.vefuture.big_bottle.common.domain.ApiResponse;
+import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.web.auth.entity.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +39,13 @@ public class TestController {
         map.put("msg", "success");
         map.put("data", user);
         return map;
+    }
 
+
+    @RequireRole("admin")
+    @GetMapping("/admin_only")
+    public ApiResponse testRolesAuth(HttpServletRequest request){
+        LoginUser user = (LoginUser) request.getAttribute("loginUser");
+        return ApiResponse.success(ResultCode.SUCCESS.getCode(), "欢迎管理员", user);
     }
 }

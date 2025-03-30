@@ -181,6 +181,12 @@
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>
         </dependency>
+        <!-- 切面 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
 
     </dependencies>
 

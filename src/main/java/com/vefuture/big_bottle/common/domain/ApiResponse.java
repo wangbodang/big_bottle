@@ -5,6 +5,7 @@ package com.vefuture.big_bottle.common.domain;
  * @date 2025/3/15
  * @description TODO: 类描述
  */
+import cn.hutool.core.util.StrUtil;
 import com.vefuture.big_bottle.common.enums.ResultCode;
 import lombok.Data;
 
@@ -35,6 +36,9 @@ public class ApiResponse<T> implements Serializable {
     }
 
     public static <T> ApiResponse<T> success(Integer code, String msg, T data) {
+        if(StrUtil.isNotBlank(msg)){
+            return new ApiResponse<>(ResultCode.SUCCESS.getCode(), msg, data);
+        }
         return new ApiResponse<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);
     }
 

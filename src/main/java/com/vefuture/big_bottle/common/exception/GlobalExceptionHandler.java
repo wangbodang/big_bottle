@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 处理权限异常
+    @ExceptionHandler(ForbiddenException.class)
+    public ApiResponse handleForbidden(ForbiddenException ex) {
+        return ApiResponse.error(ResultCode.FORBIDDEN.getCode(), ex.getMessage());
+    }
+
     // 捕获所有自定义业务异常
     @ExceptionHandler(BusinessException.class)
     public ApiResponse handleBusinessException(BusinessException ex) {
