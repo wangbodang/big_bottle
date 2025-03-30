@@ -11,9 +11,11 @@ import org.junit.Test;
 @Slf4j
 public class StringTest {
 
+    //0x204002c2bD2FCE451c7806870E54C6C7509691E3
     @Test
     public void testStrLower(){
         String walletAddress = "0X204002C2BD2FCE451C7806870E54C6C7509691E3";
         System.out.println(walletAddress.toLowerCase());
+
     }
 }
