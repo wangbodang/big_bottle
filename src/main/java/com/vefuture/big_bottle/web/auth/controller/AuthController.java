@@ -50,3 +50,34 @@ public class AuthController {
         return result;
     }
 }
+/*
+// ✅ 8. 登录失败次数限制（简单缓存控制）
+// 在登录逻辑里添加如下伪代码逻辑：
+// 使用 Redis 或 ConcurrentHashMap 模拟：Map<String, Integer> loginFailMap;
+//
+// if (loginFailMap.getOrDefault(username, 0) > MAX_RETRY) {
+//     throw new BusinessException("登录失败次数过多，请稍后再试");
+// }
+//
+// 登录失败时 loginFailMap.put(username, failCount++);
+// 登录成功时 loginFailMap.remove(username);
+
+
+// ✅ 9. JWT 自动刷新（伪逻辑）：
+// 在拦截器或过滤器中判断 token 剩余时间
+// if (token 剩余有效期 < 某阈值) {
+//    自动生成新 token 并返回给前端（加到响应头 or 响应体）
+// }
+
+
+// ✅ 10. 国际化 i18n 提示（使用 messages.properties）
+// 配置：Spring 的 MessageSource + localeResolver
+// 使用方式：messageSource.getMessage("auth.forbidden", null, locale);
+// 在 ApiResponse 中返回国际化后的 msg 文本
+
+// 示例 messages.properties
+// auth.forbidden = 权限不足
+// auth.unauthorized = 未登录或登录过期
+// auth.tooManyAttempts = 登录失败次数过多，请稍后再试
+
+*/
