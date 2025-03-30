@@ -41,4 +41,13 @@ public interface BVefutureBigBottleService extends IService<BVefutureBigBottle> 
      * @return  返回值说明
      */
     ApiResponse<CardInfoVo> getCardInfoByWalletAddress(ReqBigBottleQo qo);
+
+    /**
+     *
+     * 获取周积分
+     * @param  qo
+     * @return  返回值说明
+     */
+
+    ApiResponse<CardInfoVo> getWeekPointsByWalletAddress(ReqBigBottleQo qo);
 }

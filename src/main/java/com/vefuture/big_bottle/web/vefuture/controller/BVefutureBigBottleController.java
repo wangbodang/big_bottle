@@ -44,6 +44,19 @@ public class BVefutureBigBottleController {
         ApiResponse<CardInfoVo> cardInfo = bigBottleService.getCardInfoByWalletAddress(qo);
         return cardInfo;
     }
+
+    /**
+     *
+     * 获取标签页的内容
+     * @param  qo 请求参数
+     * @return
+     */
+    @RequestMapping(value = "/weekpoints", method = RequestMethod.POST)
+    public ApiResponse<CardInfoVo> getWeekPoints(@RequestBody ReqBigBottleQo qo){
+        log.info("---> 请求card_info时的钱包地址为:[{}]", qo.getWalletAddress());
+        ApiResponse<CardInfoVo> cardInfo = bigBottleService.getWeekPointsByWalletAddress(qo);
+        return cardInfo;
+    }
     /**
      * 前端发送
      *
