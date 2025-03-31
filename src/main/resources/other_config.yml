@@ -1,3 +1,5 @@
+
+
 jwt:
   secret: DBggVjX8FdEO8ckmVLpVjATP6t6OJFgeVIzfpDKSWLI=  # 示例密钥（必须是 Base64 编码，32 字节以上）
   expire: 7200000  # 可选：过期时间（毫秒）= 2 小时

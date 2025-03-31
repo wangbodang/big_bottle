@@ -21,17 +21,20 @@ import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoDrink;
 import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoLLMJson;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
+import com.vefuture.big_bottle.web.vefuture.entity.vo.CountLimitVo;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -49,6 +52,8 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     private BigBottleProperties bigBottleProperties;
     @Autowired
     private ExecutorService threadPoolExecutor;
+    @Value("${bigbottle.counttimes.max:13}")
+    private Integer countMax;
 
     //改为配置
     //String cozeUrl = "https://api.coze.com/v1/workflow/run";
@@ -173,8 +178,55 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         return ApiResponse.success(cardInfoVo);
     }
 
-    private Integer getPointsByReceipt(BVefutureBigBottle bigBottleLast) {
-        return 0;
+    /**
+     * 根据用户的钱包确定当天上传的次数是否到达最大的限制
+     * @param qo
+     * @return
+     */
+    @Override
+    public ApiResponse<CountLimitVo> getCountLimit(ReqBigBottleQo qo) {
+        CountLimitVo countLimitVo = new CountLimitVo();
+        countLimitVo.setCountMax(countMax);
+        //钱包地址和图片地址
+        String walletAddress = qo.getWalletAddress();
+        if(StrUtil.isBlank(walletAddress)){
+            log.info("---> 缺失参数 walletAddress不能为空");
+            return ApiResponse.error(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(), ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
+        }
+
+        walletAddress = walletAddress.toLowerCase();
+        //查询出当天上传的次数
+        Integer currentCount = getCountByWalletAddress(walletAddress);
+        countLimitVo.setCountCurrent(currentCount);
+        return ApiResponse.success(countLimitVo);
+    }
+
+    //查询出当前用户当天上传的小票张数
+    private Integer getCountByWalletAddress(String walletAddress) {
+        //当前本地时间
+        LocalDateTime now = LocalDateTime.now();
+        LambdaQueryWrapper<BVefutureBigBottle> queryWrapper = new LambdaQueryWrapper<>();
+        //钱包地址，返回信息是可用的，是否超期可用
+        queryWrapper.eq(BVefutureBigBottle::getWalletAddress, walletAddress);
+        //限制插入时间为本周的开始
+        Date currentTime = BbDateTimeUtils.localDateTimeToDate(now);
+        DateTime beginOfWeek = DateUtil.beginOfDay(currentTime);
+        queryWrapper.ge(BVefutureBigBottle::getCreateTime, beginOfWeek);
+        queryWrapper.le(BVefutureBigBottle::getCreateTime, currentTime);
+        //按id排序
+        queryWrapper.orderByDesc(BVefutureBigBottle::getId);
+        List<BVefutureBigBottle> bigBottles = baseMapper.selectList(queryWrapper);
+        if(CollectionUtil.isEmpty(bigBottles)) {
+            return 0;
+        }
+        int count = bigBottles.stream()
+                .collect(Collectors.toMap(
+                        BVefutureBigBottle::getImgUrl,   // 去重 key（比如 name）
+                        p -> p,            // 保留的值（这里是整个对象）
+                        (existing, replacement) -> existing // 保留重复时的哪个（保留第一个）
+                ))
+                .size();  // 最后 map 的 size 就是去重后的 count
+        return count;
     }
 
     /*
@@ -267,7 +319,9 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
             }
 
             //todo 存到数据库
-            saveToDb(walletAddress, imgUrl, bigBottle);
+            //以当前时间作为插入时间
+            LocalDateTime currentTime = LocalDateTime.now();
+            saveToDb(walletAddress, imgUrl, bigBottle, currentTime);
         } catch (IOException e) {
             //throw new BusinessException(430, "业务异常:"+e.getMessage(), e);
             e.printStackTrace();
@@ -278,7 +332,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     }
 
     //存储到
-    private void saveToDb(String walletAddress, String imgUrl, RetinfoBigBottle retinfoBigBottle) {
+    private void saveToDb(String walletAddress, String imgUrl, RetinfoBigBottle retinfoBigBottle, LocalDateTime currentTime) {
 
         ArrayList<RetinfoDrink> drinkList = retinfoBigBottle.getDrinkList();
         drinkList.forEach(drink -> {
@@ -293,6 +347,9 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
             bigBottle.setRetinfoDrinkName(drink.getRetinfoDrinkName());
             bigBottle.setRetinfoDrinkCapacity(drink.getRetinfoDrinkCapacity());
             bigBottle.setRetinfoDrinkAmout(drink.getRetinfoDrinkAmout());
+
+            //一张小票用统一一个插入时间便于后期统计
+            bigBottle.setCreateTime(BbDateTimeUtils.localDateTimeToDate(currentTime));
             this.save(bigBottle);
         });
     }

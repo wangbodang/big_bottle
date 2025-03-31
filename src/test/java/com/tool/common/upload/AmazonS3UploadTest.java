@@ -1,4 +1,4 @@
-package com.vechain.upload;
+package com.tool.common.upload;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
@@ -48,9 +48,13 @@ public class AmazonS3UploadTest {
         */
 
         String fileObjKeyName = "images/2025/03/15/_MG_1425_3k.jpg";
-        String fileName = "E:\\CANON2025A\\2025_03_14\\3k\\xxxx.png";
-        String objectKey = "uploads/xxxx.png";
-        String contentType = "image/png";
+
+        //IMG_20250331_230309 小米手机的
+        //DSC02529_3k 索尼
+        String imgPath = "C:\\Workspace\\Test\\demo\\";
+        String fileName = "IMG_20250331_230309.jpg";
+        String objectKey = "uploads/IMG_20250331_230309.jpg";
+        String contentType = "image/jpg";
 
         // https://bvefuturebigbottle.s3.ap-southeast-2.amazonaws.com/uploads/_MG_1368_3k.jpg
         // String url = "https://" + bucketName + ".s3.amazonaws.com/" + objectKey;
@@ -84,7 +88,7 @@ public class AmazonS3UploadTest {
             s3Client.putObject(request);
             */
             // 1. 创建文件对象
-            File file = new File(fileName);
+            File file = new File(imgPath + fileName);
             //String key = "uploads/image.jpg";
             // 2. 设置元数据
             ObjectMetadata metadata = new ObjectMetadata();
