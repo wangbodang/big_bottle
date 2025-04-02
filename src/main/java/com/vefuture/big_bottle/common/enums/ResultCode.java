@@ -18,7 +18,7 @@ public enum ResultCode {
     RECEIPT_ERR_UNAVAILABLE(301, "该小票相关信息不完整"),
     RECEIPT_ERR_PARAMETER_NOT_COMPLETE(303, "参数不完整"),
     RECEIPT_ERR_UNMEET(305, "Your receipt doesn't meet the requirements"),
-    RECEIPT_MAX_SUBMIT_COUNT(307, "已经到达最大上传次数");
+    RECEIPT_MAX_SUBMIT_COUNT(307, "已经到达每天最大上传次数");
 
     private final int code;
     private final String message;
