@@ -9,4 +9,4 @@ bigbottle:
     coze_token: Bearer pat_lUnXXnZwd75NmjB5GIXtZAo6uR5rEhDziooiD2AxF9d12HFqTIFSV1uWKSRK8Bdd
   ##每天上传最大次数
   counttimes:
-    max: 10
+    max: 2

@@ -6,8 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * @author wangb
@@ -43,6 +46,14 @@ public class CollectionTest {
                 ))
                 .size();  // 最后 map 的 size 就是去重后的 count
         System.out.println(count);
+
+        int count2 = people.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Person::getName))),
+                        Set::size
+                ));
+        System.out.println(count2);
+
     }
 
 }
