@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.vefuture.big_bottle.common.config.BigBottleProperties;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
+import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.common.util.BbDateTimeUtils;
 import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import com.vefuture.big_bottle.common.vechain.BodyEntity;
@@ -52,9 +53,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     @Value("${bigbottle.counttimes.max:2}")
     private Integer countMax;
 
-    //从单例class获取
-    //private final OkHttpClient client = new OkHttpClient();
-    private final OkHttpClient client = OkHttpUtil.getClient();
+
 
     /**
      *
@@ -109,8 +108,6 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         ApiResponse<CardInfoVo> success = ApiResponse.success(cardInfoVo);
         return success;
     }
-
-
 
     /**
      * 根据钱包信息获取当周积分
@@ -167,8 +164,6 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         return ApiResponse.success(countLimitVo);
     }
 
-
-
     /**
      *
      * @param  reqBigBottleQo
@@ -192,50 +187,12 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
             log.info("---> 今天上传次数为:[{}], 已到达最大次数", currDayCountByWalletAddress);
             return ApiResponse.error(ResultCode.RECEIPT_MAX_SUBMIT_COUNT.getCode(), ResultCode.RECEIPT_MAX_SUBMIT_COUNT.getMessage());
         }
-
-        //构造请求参数
-        ParameterEntity parameterEntity = new ParameterEntity();
-        parameterEntity.setImg_url(imgUrl);
-        BodyEntity bodyEntity = new BodyEntity();
-        bodyEntity.setWorkflow_id(bigBottleProperties.getCoze_workflow_id());
-        bodyEntity.setParameters(parameterEntity);
-
-        // 3. 使用 Gson（或 Jackson 等）将实体转换为 JSON 字符串
-        String jsonString = JSON.toJSONString(bodyEntity);
-        log.info("---> 请求参数为:{}", jsonString);
-        // 4. 将 JSON 字符串封装为 RequestBody
-        RequestBody body = RequestBody.create(jsonString, MediaType.get("application/json; charset=utf-8"));
-
         try {
-            Request request = new Request.Builder()
-                    .header("Authorization", bigBottleProperties.getCoze_token())
-                    .header("Content-Type", "application/json")
-                    .url(bigBottleProperties.getCoze_url())
-                    .post(body)
-                    .build();
-
-            Response response = client.newCall(request).execute();
-
-            String retJsonString = response.body().string();
-            log.info("---> 返回值为:{}", retJsonString);
-
-            RetinfoLLMJson retinfoLLMJson = JSON.parseObject(retJsonString, RetinfoLLMJson.class);
-            String contentStr = retinfoLLMJson.getData();
-            log.info("---> 返回的票据信息为:[{}]", contentStr);
-
-            RetinfoBigBottle bigBottle = JSON.parseObject(contentStr, RetinfoBigBottle.class);
-
-            if(!bigBottle.getRetinfoIsAvaild()){
-                log.info("---> 该票据信息不完整");
-                return ApiResponse.error(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
-            }
-
-            //todo 存到数据库
-            //以当前时间作为插入时间
-            LocalDateTime currentTime = LocalDateTime.now();
-            saveToDb(walletAddress, imgUrl, bigBottle, currentTime);
+            bigBottleMethod.sendReqAndSave(walletAddress, imgUrl);
+        } catch (BusinessException businessException){
+            log.error("===> 业务异常:{}", businessException.getMessage());
+            return ApiResponse.error(businessException.getCode(), businessException.getMessage());
         } catch (IOException e) {
-            //throw new BusinessException(430, "业务异常:"+e.getMessage(), e);
             e.printStackTrace();
             log.error("===> 业务异常:{}", e.getMessage());
             return ApiResponse.error(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage());
@@ -243,26 +200,5 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         return ApiResponse.success();
     }
 
-    //存储到
-    private void saveToDb(String walletAddress, String imgUrl, RetinfoBigBottle retinfoBigBottle, LocalDateTime currentTime) {
 
-        ArrayList<RetinfoDrink> drinkList = retinfoBigBottle.getDrinkList();
-        drinkList.forEach(drink -> {
-            BVefutureBigBottle bigBottle = new BVefutureBigBottle();
-            //公共信息
-            bigBottle.setWalletAddress(walletAddress.toLowerCase());
-            bigBottle.setImgUrl(imgUrl);
-            bigBottle.setRetinfoIsAvaild(retinfoBigBottle.getRetinfoIsAvaild());
-            bigBottle.setRetinfoReceiptTime(retinfoBigBottle.getRetinfoReceiptTime());
-            bigBottle.setIsTimeThreshold(retinfoBigBottle.getTimeThreshold());
-            //饮料信息
-            bigBottle.setRetinfoDrinkName(drink.getRetinfoDrinkName());
-            bigBottle.setRetinfoDrinkCapacity(drink.getRetinfoDrinkCapacity());
-            bigBottle.setRetinfoDrinkAmout(drink.getRetinfoDrinkAmout());
-
-            //一张小票用统一一个插入时间便于后期统计
-            bigBottle.setCreateTime(BbDateTimeUtils.localDateTimeToDate(currentTime));
-            this.save(bigBottle);
-        });
-    }
 }
