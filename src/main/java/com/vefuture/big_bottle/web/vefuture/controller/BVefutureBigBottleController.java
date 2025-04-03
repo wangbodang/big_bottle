@@ -10,7 +10,6 @@ import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CountLimitVo;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +27,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-//@RequestMapping("/vefuture/bigbottle")
+@RequestMapping("/vefuture")
 public class BVefutureBigBottleController {
 
     @Resource
