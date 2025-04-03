@@ -3,6 +3,7 @@ server:
   port: 8083
   servlet:
     context-path: /bigbottle
+  address: 0.0.0.0
 
 app:
   name: @project.name@

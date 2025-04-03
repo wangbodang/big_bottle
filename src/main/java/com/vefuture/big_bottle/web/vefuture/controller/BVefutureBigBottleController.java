@@ -83,6 +83,13 @@ public class BVefutureBigBottleController {
         ApiResponse<CountLimitVo> responseVo = bigBottleService.getCountLimit(qo);
         return responseVo;
     }
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public ApiResponse getTestInfo(){
+        log.info("---> 到达测试请求后台...................");
+        return ApiResponse.success();
+    }
+
     /**
      * 保存到数据库
      * @param bigBottle
