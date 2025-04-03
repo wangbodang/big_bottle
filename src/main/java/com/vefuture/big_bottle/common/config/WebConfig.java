@@ -2,6 +2,7 @@ package com.vefuture.big_bottle.common.config;
 
 // WebConfig.java
 import com.vefuture.big_bottle.common.interceptor.JwtInterceptor;
+import com.vefuture.big_bottle.common.interceptor.VefutureInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.*;
@@ -15,6 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
     private JwtInterceptor jwtInterceptor;
+    @Autowired
+    private VefutureInterceptor vefutureInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -31,5 +34,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/webjars/**",
                         "/error"
                 );
+        // 第二个拦截器：Vefuture 拦截器，只拦 /vechain/** 路径
+        registry.addInterceptor(vefutureInterceptor)
+                .addPathPatterns("/vefuture/**");
     }
 }
