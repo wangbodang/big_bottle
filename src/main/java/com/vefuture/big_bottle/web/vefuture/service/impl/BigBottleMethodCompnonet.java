@@ -105,18 +105,21 @@ public class BigBottleMethodCompnonet extends ServiceImpl<BVefutureBigBottleMapp
 
     /*
      * 如果两个都是true， 其他信息都有 但是饮料容积拿不到的时候 积分用第一条规则
+     *  Drink Volume < 700ml = 1 Point
+        Drink Volume 700ml to < 2000ml = 10 Points
+        Drink Volume ≥ 2000ml = 15 Points
      */
     private Integer getPoints(BVefutureBigBottle bigBottle) {
         Integer capacity = bigBottle.getRetinfoDrinkCapacity();
         if(ObjectUtil.isEmpty(capacity) && ObjectUtil.isNotEmpty(bigBottle.getRetinfoDrinkName()) && ObjectUtil.isNotEmpty(bigBottle.getRetinfoDrinkAmout())){
             return bigBottle.getRetinfoDrinkAmout() * (Integer) 1;
         }
-        if(capacity < 1000)
+        if(capacity < 700)
             return bigBottle.getRetinfoDrinkAmout() * (Integer) 1;
-        if(capacity <= 2000)
-            return bigBottle.getRetinfoDrinkAmout() * (Integer) 5;
-        if(capacity > 2000)
-            return bigBottle.getRetinfoDrinkAmout() * (Integer) 7;
+        if(capacity < 2000)
+            return bigBottle.getRetinfoDrinkAmout() * (Integer) 10;
+        if(capacity >= 2000)
+            return bigBottle.getRetinfoDrinkAmout() * (Integer) 15;
         return 0;
     }
 
