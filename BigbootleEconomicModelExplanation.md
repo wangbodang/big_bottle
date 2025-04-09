@@ -1,3 +1,4 @@
+
 # Bigbootle Economic Model Explanation
 
 This document outlines the economic model for the $B3TR token within the Bigbootle application, covering the team share allocation mechanism and the rules for user token acquisition and distribution.
@@ -7,30 +8,12 @@ This document outlines the economic model for the $B3TR token within the Bigboot
 The $B3TR$ token share allocated to the team consists of two parts:
 
 1.  **Base Allocation:** 100% of this portion is allocated to the team.
-2.  **Votes Allocation:** The proportion taken from this allocation is dynamically linked to the market price ($P$) of the $B3TR token. The specific calculation formula is as follows:
-
-Let $P$ be the price of $B3TR$, and $R$ be the proportion the team takes from the Votes Allocation pool:
-
-```math
-R =
-\begin{cases}
-0.3, & \text{if } P \leq 0.5 \\
-0.3 \times \frac{1 - P}{0.5}, & \text{if } 0.5 < P < 1 \\
-0, & \text{if } P \geq 1
-\end{cases}
-```
-
-**Parameter Descriptions:**
-
-* $P$: The real-time price of the $B3TR token.
-* $R$: The proportion of tokens the team can withdraw from the current Votes Allocation pool (as a percentage of that pool's total).
+2.  **Votes Allocation:** The team receives a fixed **70%** share from this allocation pool in each distribution period.
 
 **Mechanism Interpretation:**
 
-* When the price of $B3TR$ is less than or equal to $0.5 USD, the team consistently receives 30% of the Votes Allocation pool.
-* When the price is between $0.5 USD and $1 USD, the proportion the team receives decreases linearly from 30% as the price increases. For example, if the price is $0.75 USD, the proportion $R = 0.3 \times (1 - 0.75) / 0.5 = 0.15$, meaning 15%.
-* When the price reaches or exceeds $1 USD, the team no longer takes a share from the Votes Allocation pool (proportion is 0%).
-    * *This design aims to inversely correlate team earnings (within a specific range) with token value, encouraging the team to focus on increasing the long-term value of $B3TR$.*
+* A defined portion of tokens is designated as the "Votes Allocation" pool periodically.
+* From this specific pool, the team consistently receives 70% of the tokens allocated during that period. The remaining 30% may be allocated for other purposes as defined by the project's governance or tokenomics.
 
 ## 2. User Token Distribution
 
@@ -81,3 +64,4 @@ The amount of $B3TR$ tokens a user can claim each week depends on the proportion
 ---
 
 *Disclaimer: This economic model may be subject to adjustments based on project development and community governance. Please refer to the latest official information.*
+```
