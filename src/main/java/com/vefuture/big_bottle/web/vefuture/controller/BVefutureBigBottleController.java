@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
  * <p>
@@ -87,7 +88,14 @@ public class BVefutureBigBottleController {
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public ApiResponse getTestInfo(){
         log.info("---> 到达测试请求后台...................");
-        return ApiResponse.success();
+        try {
+            Optional<BVefutureBigBottle> optById = bigBottleService.getOptById(1);
+            log.info("---> 查询数据成功:{}", optById);
+            return ApiResponse.success(optById);
+        } catch (Exception e) {
+            log.error("---> 查询数据异常:{}", e.getMessage());
+            return ApiResponse.error(ResultCode.NOT_FOUND.getCode(), "未查询到数据");
+        }
     }
 
     /**
