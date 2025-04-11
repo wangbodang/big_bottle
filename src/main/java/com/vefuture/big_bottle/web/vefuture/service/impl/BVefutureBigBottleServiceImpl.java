@@ -42,7 +42,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     private BigBottleMethodCompnonet bigBottleMethod;
     @Autowired
     private ExecutorService threadPoolExecutor;
-    @Value("${bigbottle.counttimes.max:2}")
+    @Value("${bigbottle.counttimes.max:10}")
     private Integer countMax;
 
 
