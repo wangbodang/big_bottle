@@ -67,7 +67,7 @@ jobs:
             > $LOG_FILE
             
             echo "启动新服务: $JAR_PATH"
-            setsid nohup java -jar $JAR_PATH > $LOG_FILE 2>&1 < /dev/null &
+            setsid nohup java -jar $JAR_PATH --spring.config.additional-location=file:/home/ubuntu/bigbottle/config/application.yml > $LOG_FILE 2>&1 < /dev/null &
             
             echo "等待服务启动 (最多等待 60 秒)..."
             COUNTER=0
