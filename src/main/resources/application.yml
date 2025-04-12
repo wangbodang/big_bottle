@@ -11,13 +11,6 @@ server:
     context-path: /bigbottle
   address: 0.0.0.0
 
-app:
-  name: big_bottle
-  version: 0.0.1
-  groupId: com.vefuture
-build:
-  time: '@build.timestamp@'
-
 ##spring config
 spring:
   application:
