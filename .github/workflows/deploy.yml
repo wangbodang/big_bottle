@@ -30,7 +30,7 @@ jobs:
 
       # 在 '构建 Spring Boot 项目并获取 JAR 名称' 步骤之后添加:
       - name: 检查 JAR 文件输出变量的值
-        run:
+        run: |
           echo "The determined JAR file is: ${{ steps.build.outputs.jar_file }}"
 
       - name: 上传到 EC2
