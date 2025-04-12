@@ -55,7 +55,7 @@ jobs:
             DEPLOY_DIR="/home/ubuntu/bigbottle" # 确认用户和路径
             # 如果需要，修复 JAR_PATH (例如，如果它在 target 子目录)
             # JAR_PATH="$DEPLOY_DIR/$JAR_NAME"
-            JAR_PATH="$DEPLOY_DIR/target/$JAR_NAME" # 假设根据上次调试结果，它在 target 下
+            JAR_PATH="$DEPLOY_DIR/$JAR_NAME" # 假设根据上次调试结果，它在 target 下
             LOG_FILE="$DEPLOY_DIR/app.log"
             APP_PORT=8083 # <--- 在这里替换成你的应用端口号!
             
