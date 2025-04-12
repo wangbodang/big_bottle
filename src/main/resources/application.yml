@@ -12,9 +12,9 @@ server:
   address: 0.0.0.0
 
 app:
-  name: @project.name@
-  version: @project.version@
-  groupId: @project.groupId@
+  name: big_bottle
+  version: 0.0.1
+  groupId: com.vefuture
 build:
   time: '@build.timestamp@'
 
