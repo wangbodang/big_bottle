@@ -35,15 +35,21 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            echo "尝试关闭旧服务（如有）"
-            pkill -f 'java.*jar' || echo "未检测到旧服务"
-      
+            echo "尝试关闭旧服务（如果有）"
+            pkill -f 'java.*jar' || echo "无旧服务可杀"
+          
             echo "启动新服务"
-            nohup java -jar /home/ubuntu/bigbottle/*.jar > app.log 2>&1 &
-            sleep 2
-      
-            echo "确认服务启动"
-            pgrep -fl 'java.*jar' && echo "✅ 服务已启动" || echo "⚠️ 服务未检测到"
-      
-            echo "退出脚本（避免 GitHub Actions 误判）"
-            exit 0
+            setsid nohup java -jar /home/ubuntu/bigbottle/*.jar > /home/ubuntu/bigbottle/app.log 2>&1 < /dev/null &
+          
+            echo "等待服务启动..."
+            sleep 3
+          
+            echo "检查是否启动成功"
+            if pgrep -f 'java.*jar'; then
+            echo "✅ 服务已成功启动"
+            else
+            echo "❌ 服务启动失败"
+            exit 1
+            fi
+          
+            echo "🟢 完成部署"
