@@ -15,7 +15,6 @@ jobs:
 
       - name: 构建 Spring Boot 项目
         run: |
-          cd backend
           ./mvnw clean package -DskipTests
 
       - name: 上传到 EC2
@@ -24,7 +23,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "backend/target/*.jar"
+          source: "target/*.jar"
           target: "/home/ubuntu/bigbottle"
 
       - name: 远程重启服务
