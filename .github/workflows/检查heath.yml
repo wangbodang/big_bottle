@@ -44,61 +44,64 @@ jobs:
           strip_components: 1 # <--- 尝试加回这一行
           # strip_components: 1 # 当 source 是具体文件时，不需要 strip_components
 
-      - name: 远程重启服务 (检查端口监听版)
-        uses: appleboy/ssh-action@v1.0.3
+      - name: 远程重启服务
+        uses: appleboy/ssh-action@v1.0.3 # 更新 ssh 版本 (或更新的版本)
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            # 从路径中提取 JAR 文件名，用于后续命令
             JAR_NAME=$(basename ${{ steps.build.outputs.jar_file }})
-            DEPLOY_DIR="/home/ubuntu/bigbottle" # 确认用户和路径
-            # 如果需要，修复 JAR_PATH (例如，如果它在 target 子目录)
-            # JAR_PATH="$DEPLOY_DIR/$JAR_NAME"
-            JAR_PATH="$DEPLOY_DIR/target/$JAR_NAME" # 假设根据上次调试结果，它在 target 下
+            DEPLOY_DIR="/home/ubuntu/bigbottle"
+            JAR_PATH="$DEPLOY_DIR/$JAR_NAME"
             LOG_FILE="$DEPLOY_DIR/app.log"
-            APP_PORT=8083 # <--- 在这里替换成你的应用端口号!
-            
+
             echo "尝试关闭旧服务（如果有）..."
+            # 使用 pkill 查找包含特定 JAR 文件名的进程，更精确
+            # 在命令组外部使用 true 确保即使 pkill 找到并终止进程 (进程以 143 退出), 脚本也不会失败
             (pkill -f "java.*$JAR_NAME" || echo "无旧服务可杀") && true
             echo "等待旧服务关闭..."
-            sleep 5
+            sleep 5 # 给旧进程一点时间彻底关闭
+
             echo "清理旧日志（可选）"
             > $LOG_FILE
-            
+
             echo "启动新服务: $JAR_PATH"
+            # 使用确切的 JAR 路径启动
             setsid nohup java -jar $JAR_PATH > $LOG_FILE 2>&1 < /dev/null &
-            
+
             echo "等待服务启动 (最多等待 60 秒)..."
             COUNTER=0
             MAX_WAIT=12 # 总共等待 12 * 5 = 60 秒
             SUCCESS=false
             while [ $COUNTER -lt $MAX_WAIT ]; do
-              echo "检查进程是否存在..."
+              # 检查进程是否存在 (更精确地检查包含 JAR 名称的进程)
               if pgrep -f "java.*$JAR_NAME"; then
-                echo "进程已找到，检查端口 $APP_PORT 是否监听..."
-                # 使用 ss 命令检查指定端口是否处于 LISTEN 状态
-                # -H: 不打印表头, -t: TCP, -l: Listening, -n: 数字端口, -p: 进程信息
-                # grep LISTEN 确保状态是监听
-                if ss -H -tlpn 'sport = :'$APP_PORT | grep LISTEN; then
-                  echo "✅ 端口 $APP_PORT 正在监听"
+                echo "进程已找到，等待应用响应..."
+                # (可选，但强烈推荐) 检查健康检查端点
+                # 假设应用在 8080 端口，健康端点是 /actuator/health
+                if curl --output /dev/null --silent --head --fail http://localhost:8080/actuator/health; then
+                  echo "✅ 服务已启动并健康检查通过"
                   SUCCESS=true
                   break
                 else
-                  echo "端口 $APP_PORT 尚未监听，继续等待..."
+                  echo "应用进程存在，但健康检查端点未响应，继续等待..."
                 fi
               else
-                echo "Java 进程未找到，继续等待..."
+                echo "Java 进程未找到，可能启动失败或已退出，继续等待..."
               fi
               sleep 5
               COUNTER=$((COUNTER+1))
             done
-            
+
             if [ "$SUCCESS" = false ]; then
-              echo "❌ 服务在 $MAX_WAIT * 5 秒内未能成功启动或端口未监听"
+              echo "❌ 服务在 $MAX_WAIT * 5 秒内未能成功启动或响应健康检查"
               echo "查看日志: $LOG_FILE"
-              tail -n 50 $LOG_FILE || echo "无法读取日志文件"
+              # 可以尝试输出日志尾部内容帮助调试
+              tail -n 50 $LOG_FILE
               exit 1
             fi
-            
+
             echo "✅ 完成部署"
+            # 不再需要 sleep 12 和 exit 0
