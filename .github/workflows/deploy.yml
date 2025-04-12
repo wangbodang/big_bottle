@@ -51,5 +51,7 @@ jobs:
             echo "❌ 服务启动失败"
             exit 1
             fi
-          
-            echo "🟢 完成部署"
+           
+            echo "✅ 完成部署，退出 GitHub Actions"
+            sleep 12
+            exit 0
