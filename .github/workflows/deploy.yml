@@ -26,6 +26,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           source: "target/*.jar"
           target: "/home/ubuntu/bigbottle"
+          strip_components: 1
 
       - name: 远程重启服务
         uses: appleboy/ssh-action@v0.1.6
@@ -36,3 +37,5 @@ jobs:
           script: |
             pkill -f 'java.*jar'
             nohup java -jar /home/ubuntu/bigbottle/*.jar > app.log 2>&1 &
+            sleep 3
+            ps aux | grep java
