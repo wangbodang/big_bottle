@@ -50,3 +50,16 @@ mybatis-plus:
       id-type: auto  # 主键策略（自动增长）
       logic-delete-value: 1  # 逻辑删除的值
       logic-not-delete-value: 0
+management:
+  #server:
+    #port: 8384  #如果设置该端口, 那么应用的context-path就不起作用了
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        # include: health,info  # 只暴露 health 和 info
+        include: "*"         # 暴露所有启用的 Web 端点 (开发时常用，生产需谨慎)
+        # exclude: env,beans # 可以用 exclude 来排除某些端点
+      base-path: /actuator #/monitor 这个地方可以设置其他路径
