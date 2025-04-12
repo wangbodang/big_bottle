@@ -15,6 +15,7 @@ jobs:
 
       - name: 构建 Spring Boot 项目
         run: |
+          chmod +x mvnw
           ./mvnw clean package -DskipTests
 
       - name: 上传到 EC2
