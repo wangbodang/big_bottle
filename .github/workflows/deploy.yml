@@ -41,6 +41,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           source: ${{ steps.build.outputs.jar_file }} # 使用上一步输出的精确 JAR 文件名
           target: "/home/ubuntu/bigbottle"
+          strip_components: 1 # <--- 尝试加回这一行
           # strip_components: 1 # 当 source 是具体文件时，不需要 strip_components
 
       - name: 远程重启服务
