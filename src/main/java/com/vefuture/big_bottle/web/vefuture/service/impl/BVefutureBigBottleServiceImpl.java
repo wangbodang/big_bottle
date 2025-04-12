@@ -39,7 +39,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     @Autowired
     private BigBottleProperties bigBottleProperties;
     @Autowired
-    private BigBottleMethodCompnonet bigBottleMethod;
+    private BigBottleLogicProcessor bottleLogicProcessor;
     @Autowired
     private ExecutorService threadPoolExecutor;
     @Value("${bigbottle.counttimes.max:10}")
@@ -78,7 +78,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         walletAddress = walletAddress.toLowerCase();
 
         //获取本周内小票列表
-        List<BVefutureBigBottle> bigBottles = bigBottleMethod.getCurrWeekBigBottles(walletAddress);
+        List<BVefutureBigBottle> bigBottles = bottleLogicProcessor.getCurrWeekBigBottles(walletAddress);
 
         if(CollectionUtil.isEmpty(bigBottles)){
             log.info("---> 钱包地址[{}]本周内没有合适的小票", walletAddress);
@@ -94,7 +94,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         cardInfoVo.setReceiptUploadTime(bigBottleLast.getCreateTime());
 
         //设定最后一张小票的积分
-        Integer currWeekPoints = bigBottleMethod.getPointsByReceipts(new ArrayList<>(Arrays.asList(bigBottleLast)));
+        Integer currWeekPoints = bottleLogicProcessor.getPointsByReceipts(new ArrayList<>(Arrays.asList(bigBottleLast)));
         cardInfoVo.setPoints(currWeekPoints);
 
         ApiResponse<CardInfoVo> success = ApiResponse.success(cardInfoVo);
@@ -119,7 +119,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         walletAddress = walletAddress.toLowerCase();
 
         //获取本周内小票列表
-        List<BVefutureBigBottle> currentWeekBigBottles = bigBottleMethod.getCurrWeekBigBottles(walletAddress);
+        List<BVefutureBigBottle> currentWeekBigBottles = bottleLogicProcessor.getCurrWeekBigBottles(walletAddress);
         if(CollectionUtil.isEmpty(currentWeekBigBottles)){
             log.info("---> 该地址:[{}]本周没有积分", walletAddress);
             cardInfoVo.setWeekPoints(0);
@@ -127,7 +127,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         }
 
         //获取本周积分
-        Integer currWeekPoints = bigBottleMethod.getPointsByReceipts(currentWeekBigBottles);
+        Integer currWeekPoints = bottleLogicProcessor.getPointsByReceipts(currentWeekBigBottles);
         cardInfoVo.setWeekPoints(currWeekPoints);
         return ApiResponse.success(cardInfoVo);
     }
@@ -151,7 +151,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
 
         walletAddress = walletAddress.toLowerCase();
         //查询出当天上传的次数
-        Integer currentCount = bigBottleMethod.getCurrDayCountByWalletAddress(walletAddress);
+        Integer currentCount = bottleLogicProcessor.getCurrDayCountByWalletAddress(walletAddress);
         countLimitVo.setCountCurrent(currentCount);
         return ApiResponse.success(countLimitVo);
     }
@@ -173,14 +173,14 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         }
         walletAddress = walletAddress.toLowerCase();
 
-        Integer currDayCountByWalletAddress = bigBottleMethod.getCurrDayCountByWalletAddress(walletAddress);
+        Integer currDayCountByWalletAddress = bottleLogicProcessor.getCurrDayCountByWalletAddress(walletAddress);
         //判断今天上传次数是否达到最大次数
         if(currDayCountByWalletAddress >= countMax){
             log.info("---> 今天上传次数为:[{}], 已到达最大次数", currDayCountByWalletAddress);
             return ApiResponse.error(ResultCode.RECEIPT_MAX_SUBMIT_COUNT.getCode(), ResultCode.RECEIPT_MAX_SUBMIT_COUNT.getMessage());
         }
         try {
-            bigBottleMethod.sendReqAndSave(walletAddress, imgUrl);
+            bottleLogicProcessor.sendReqAndSave(walletAddress, imgUrl);
         } catch (BusinessException businessException){
             log.error("===> 业务异常:{}", businessException.getMessage());
             return ApiResponse.error(businessException.getCode(), businessException.getMessage());

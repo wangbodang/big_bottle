@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class BigBottleMethodCompnonet extends ServiceImpl<BVefutureBigBottleMapper, BVefutureBigBottle>{
+public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMapper, BVefutureBigBottle>{
 
     @Autowired
     private BigBottleProperties bigBottleProperties;

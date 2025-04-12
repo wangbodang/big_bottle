@@ -18,7 +18,11 @@ public class ThreadPoolConfig {
         long keepAliveTime = 60;                      // 空闲线程存活时间
         TimeUnit unit = TimeUnit.SECONDS;             // 时间单位（秒）
         BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>(300); // 任务队列，容量为100
-        ThreadFactory threadFactory = Executors.defaultThreadFactory();     // 默认线程工厂
+
+        //ThreadFactory threadFactory = Executors.defaultThreadFactory();     // 默认线程工厂
+        //加上自定义的 ThreadFactory，为线程命名，便于日志排查
+        ThreadFactory threadFactory = r -> new Thread(new ThreadGroup("bottle-pool"), r, "bottle-thread-" + r.hashCode());
+
         RejectedExecutionHandler handler = new ThreadPoolExecutor.AbortPolicy(); // 拒绝策略
 
         return new ThreadPoolExecutor(

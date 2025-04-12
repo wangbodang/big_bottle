@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
     // 捕获所有自定义业务异常
     @ExceptionHandler(BusinessException.class)
     public ApiResponse handleBusinessException(BusinessException ex) {
-        ApiResponse error = ApiResponse.error(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
+        ApiResponse error = ApiResponse.error(ex.getCode(), ex.getMessage());
         return error;
     }
 
