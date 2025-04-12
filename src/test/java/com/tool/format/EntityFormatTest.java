@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoDrink;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 

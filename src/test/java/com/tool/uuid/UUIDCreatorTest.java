@@ -3,7 +3,7 @@ package com.tool.uuid;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.vefuture.big_bottle.common.util.UUIDCreator;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.util.UUID;

@@ -19,6 +19,7 @@ import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoDrink;
 import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoLLMJson;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
+import com.vefuture.big_bottle.web.vefuture.strategy.points.PointStrategyContext;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,8 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
 
     @Autowired
     private BigBottleProperties bigBottleProperties;
+    @Autowired
+    private PointStrategyContext pointStrategyContext;
     //从单例class获取
     //private final OkHttpClient client = new OkHttpClient();
     private final OkHttpClient client = OkHttpUtil.getClient();
@@ -95,10 +98,11 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
      * @param
      * @return  返回值说明
      */
-
     public Integer getPointsByReceipts(List<BVefutureBigBottle> bigBottles) {
         Integer sumPoint = bigBottles.stream()
-                .mapToInt(this::getPoints)
+                //.mapToInt(this::getPoints)
+                //.mapToInt(bottle -> pointStrategyContext.calculatePoints(bottle))
+                .mapToInt(pointStrategyContext::calculatePoints)
                 .sum();
         return sumPoint;
     }

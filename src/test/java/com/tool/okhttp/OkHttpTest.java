@@ -5,11 +5,9 @@ import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
 
 /**
  * @author wangb

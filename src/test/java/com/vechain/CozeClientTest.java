@@ -2,15 +2,11 @@ package com.vechain;
 
 import cn.hutool.core.date.StopWatch;
 import com.alibaba.fastjson.JSON;
-import com.vefuture.big_bottle.BigBottleApplication;
 import com.vefuture.big_bottle.common.vechain.BodyEntity;
 import com.vefuture.big_bottle.common.vechain.ParameterEntity;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.Test;
 
 
 import java.io.IOException;

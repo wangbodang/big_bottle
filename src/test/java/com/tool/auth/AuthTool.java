@@ -1,9 +1,9 @@
 package com.tool.auth;
 
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
