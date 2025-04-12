@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.vefuture.big_bottle.common.config.BigBottleProperties;
 import com.vefuture.big_bottle.common.enums.ResultCode;
@@ -18,6 +19,8 @@ import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoDrink;
 import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoLLMJson;
+import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
+import com.vefuture.big_bottle.web.vefuture.entity.vo.DrinkInfo;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
 import com.vefuture.big_bottle.web.vefuture.strategy.points.PointStrategyContext;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -216,5 +220,51 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
             bigBottle.setCreateTime(BbDateTimeUtils.localDateTimeToDate(currentTime));
             this.save(bigBottle);
         });
+    }
+
+    // 根据钱包地址获取最后十张上传的饮料数据
+    public List<BVefutureBigBottle> getLastBigBottleList(String walletAddress, Integer lastNum) {
+
+        LambdaQueryWrapper<BVefutureBigBottle> queryWrapper = new LambdaQueryWrapper<>();
+
+        //查询最后的几个小票
+        queryWrapper.eq(BVefutureBigBottle::getWalletAddress, walletAddress);
+        queryWrapper.orderByDesc(BVefutureBigBottle::getId);
+
+        // 引入分页对象
+        Page<BVefutureBigBottle> page = new Page<>(1, lastNum); // 当前页 = 1，每页条数 = 10
+        // 调用分页查询
+        Page<BVefutureBigBottle> bVefutureBigBottlePage = baseMapper.selectPage(page, queryWrapper);
+
+        // 获取分页结果
+        List<BVefutureBigBottle> records = bVefutureBigBottlePage.getRecords();
+        List<BVefutureBigBottle> collect = records.stream().sorted(Comparator.comparing(BVefutureBigBottle::getId)).collect(Collectors.toList());
+        return collect;
+    }
+
+    //把小票信息转化为CardInfo信息
+    /*
+        cardInfoVo.setDrinkName(bigBottleLast.getRetinfoDrinkName());
+        cardInfoVo.setDrinkAmout(bigBottleLast.getRetinfoDrinkAmout());
+        cardInfoVo.setDrinkCapacity(bigBottleLast.getRetinfoDrinkCapacity());
+        //最后一张小票的上传时间 - 记入数据库的时间
+        cardInfoVo.setReceiptUploadTime(bigBottleLast.getCreateTime());
+    */
+    public void setCardDrinkInfo(CardInfoVo cardInfoVo, List<BVefutureBigBottle> lastBigBottles) {
+        List<DrinkInfo> drinkInfos = new ArrayList<>();
+        //为防止出错, 先判断下是否为空
+        if(CollectionUtil.isNotEmpty(lastBigBottles)){
+            lastBigBottles.stream().forEach(bigBottle -> {
+                DrinkInfo drinkInfo = new DrinkInfo();
+                drinkInfo.setDrinkName(bigBottle.getRetinfoDrinkName());
+                drinkInfo.setDrinkAmout(bigBottle.getRetinfoDrinkAmout());
+                drinkInfo.setDrinkCapacity(bigBottle.getRetinfoDrinkCapacity());
+                //小票的上传时间 - 记入数据库的时间
+                drinkInfo.setReceiptUploadTime(bigBottle.getCreateTime());
+                drinkInfo.setPoints(pointStrategyContext.calculatePoints(bigBottle));
+                drinkInfos.add(drinkInfo);
+            });
+        }
+        cardInfoVo.setDrinkInfos(drinkInfos);
     }
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.vefuture.big_bottle.common.config.BigBottleProperties;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
+import com.vefuture.big_bottle.common.exception.BadRequestException;
 import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
@@ -44,6 +45,8 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     private ExecutorService threadPoolExecutor;
     @Value("${bigbottle.counttimes.max:10}")
     private Integer countMax;
+    @Value("${bigbottle.counttimes.lastnum:10}")
+    private Integer lastNum;
 
 
 
@@ -71,31 +74,31 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     public ApiResponse<CardInfoVo> getCardInfoByWalletAddress(ReqBigBottleQo qo) {
         //钱包地址
         String walletAddress = qo.getWalletAddress();
-        if(StrUtil.isBlank(walletAddress)){
+        if (StrUtil.isBlank(walletAddress)) {
             log.info("---> 缺失参数 walletAddress不能为空");
-            return ApiResponse.error(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(), ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
+            throw new BadRequestException(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(),
+                    ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
         }
         walletAddress = walletAddress.toLowerCase();
 
         //获取本周内小票列表
-        List<BVefutureBigBottle> bigBottles = bottleLogicProcessor.getCurrWeekBigBottles(walletAddress);
+        List<BVefutureBigBottle> currWeekBigBottles = bottleLogicProcessor.getCurrWeekBigBottles(walletAddress);
 
-        if(CollectionUtil.isEmpty(bigBottles)){
+        /*if(CollectionUtil.isEmpty(currWeekBigBottles)){
             log.info("---> 钱包地址[{}]本周内没有合适的小票", walletAddress);
             return ApiResponse.error(ResultCode.RECEIPT_ERR_UNMEET.getCode(), ResultCode.RECEIPT_ERR_UNMEET.getMessage());
-        }
-        BVefutureBigBottle bigBottleLast = bigBottles.get(0);
+        }*/
 
+        //获取最后几张饮料数据
+        List<BVefutureBigBottle> lastBigBottles =  bottleLogicProcessor.getLastBigBottleList(walletAddress, lastNum);
         CardInfoVo cardInfoVo = new CardInfoVo();
-        cardInfoVo.setDrinkName(bigBottleLast.getRetinfoDrinkName());
-        cardInfoVo.setDrinkAmout(bigBottleLast.getRetinfoDrinkAmout());
-        cardInfoVo.setDrinkCapacity(bigBottleLast.getRetinfoDrinkCapacity());
-        //最后一张小票的上传时间 - 记入数据库的时间
-        cardInfoVo.setReceiptUploadTime(bigBottleLast.getCreateTime());
 
-        //设定最后一张小票的积分
-        Integer currWeekPoints = bottleLogicProcessor.getPointsByReceipts(new ArrayList<>(Arrays.asList(bigBottleLast)));
-        cardInfoVo.setPoints(currWeekPoints);
+        //把小票信息转换为card信息封装一下
+        bottleLogicProcessor.setCardDrinkInfo(cardInfoVo, lastBigBottles);
+
+        //设定本周有效小票的积分和
+        Integer currWeekPoints = bottleLogicProcessor.getPointsByReceipts(currWeekBigBottles);
+        cardInfoVo.setWeekPoints(currWeekPoints);
 
         ApiResponse<CardInfoVo> success = ApiResponse.success(cardInfoVo);
         return success;
@@ -112,9 +115,10 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         CardInfoVo cardInfoVo = new CardInfoVo();
         //钱包地址和图片地址
         String walletAddress = qo.getWalletAddress();
-        if(StrUtil.isBlank(walletAddress)){
+        if (StrUtil.isBlank(walletAddress)) {
             log.info("---> 缺失参数 walletAddress不能为空");
-            return ApiResponse.error(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(), ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
+            throw new BadRequestException(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(),
+                    ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
         }
         walletAddress = walletAddress.toLowerCase();
 
@@ -144,9 +148,10 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         countLimitVo.setCountMax(countMax);
         //钱包地址和图片地址
         String walletAddress = qo.getWalletAddress();
-        if(StrUtil.isBlank(walletAddress)){
+        if (StrUtil.isBlank(walletAddress)) {
             log.info("---> 缺失参数 walletAddress不能为空");
-            return ApiResponse.error(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(), ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
+            throw new BadRequestException(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(),
+                    ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
         }
 
         walletAddress = walletAddress.toLowerCase();
@@ -169,7 +174,8 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         String imgUrl = reqBigBottleQo.getImgUrl();
         if(StrUtil.isBlank(walletAddress) || StrUtil.isBlank(imgUrl)){
             log.info("---> 缺失参数 walletAddress imgUrl都不能为空");
-            return ApiResponse.error(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(), ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
+            throw new BadRequestException(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(),
+                    ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
         }
         walletAddress = walletAddress.toLowerCase();
 

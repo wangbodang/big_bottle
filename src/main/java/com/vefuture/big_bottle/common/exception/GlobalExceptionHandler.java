@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-
+    @ExceptionHandler(BadRequestException.class)
+    public ApiResponse<?> handleBadRequest(BadRequestException ex) {
+        return ApiResponse.error(ex.getCode(), ex.getMessage());
+    }
 
     // 捕获所有自定义业务异常
     @ExceptionHandler(BusinessException.class)
