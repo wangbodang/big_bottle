@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -62,16 +63,18 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         DateTime beginOfWeek = DateUtil.beginOfWeek(BbDateTimeUtils.localDateTimeToDate(now));
 
         //获取本周的小票列表 todo 标志是否为空待确定
-        List<BVefutureBigBottle> bigBottles = getBigBottleListByTimeOffset(walletAddress, beginOfWeek, currentTime, null, null);
+        List<BVefutureBigBottle> bigBottles = getBigBottleListByTimeOffset(walletAddress, beginOfWeek, currentTime, true, false, "0");
         return bigBottles;
     }
     /**
      * 根据时间间隔选出相应的饮料列表
+     * todo retinfoIsAvaild 这个条件要起效， fasle不可用
+     *      isTimeThreshold 这个条件要起效， true不可用
      *
      * @param
      * @return List 列表
      */
-    public List<BVefutureBigBottle> getBigBottleListByTimeOffset(String walletAddress, Date startDateTime, Date endDateTime, Boolean retinfoIsAvaild, Boolean isTimeThreshold){
+    public List<BVefutureBigBottle> getBigBottleListByTimeOffset(String walletAddress, Date startDateTime, Date endDateTime, Boolean retinfoIsAvaild, Boolean isTimeThreshold, String isDelete){
         List<BVefutureBigBottle> bigBottleList;
 
         LambdaQueryWrapper<BVefutureBigBottle> queryWrapper = new LambdaQueryWrapper<>();
@@ -83,9 +86,13 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         if(ObjectUtil.isNotEmpty(isTimeThreshold)){
             queryWrapper.eq(BVefutureBigBottle::getIsTimeThreshold, isTimeThreshold);
         }
+        if(StrUtil.isNotBlank(isDelete)){
+            queryWrapper.eq(BVefutureBigBottle::getIsDelete, isDelete);
+        }
         //时间跨度
         queryWrapper.ge(BVefutureBigBottle::getCreateTime, startDateTime);
         queryWrapper.le(BVefutureBigBottle::getCreateTime, endDateTime);
+        //queryWrapper.eq(BVefutureBigBottle::getIsDelete, "0");
 
         //按id排序
         queryWrapper.orderByDesc(BVefutureBigBottle::getId);
@@ -131,7 +138,7 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         return 0;
     }
 
-    //查询出当前用户当天上传的小票张数
+    //查询出当前用户当天上传的小票张数 为了限制当天次数
     public Integer getCurrDayCountByWalletAddress(String walletAddress) {
         //当前本地时间
         LocalDateTime now = LocalDateTime.now();
@@ -140,7 +147,7 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         DateTime beginOfDay = DateUtil.beginOfDay(currentTime);
 
         //获取当天的小票列 表
-        List<BVefutureBigBottle> bigBottles = getBigBottleListByTimeOffset(walletAddress, beginOfDay, currentTime, null, null);
+        List<BVefutureBigBottle> bigBottles = getBigBottleListByTimeOffset(walletAddress, beginOfDay, currentTime, true, false, null);
         if(CollectionUtil.isEmpty(bigBottles)) {
             return 0;
         }
@@ -216,13 +223,33 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
             bigBottle.setRetinfoDrinkCapacity(drink.getRetinfoDrinkCapacity());
             bigBottle.setRetinfoDrinkAmout(drink.getRetinfoDrinkAmout());
 
+            //根据该数据是否在数据库有记录判断是否为有效数据 isDelete = 1 为无效数据
+            setDeletFlag(retinfoBigBottle.getRetinfoReceiptTime(), currentTime, drink, bigBottle, walletAddress);
             //一张小票用统一一个插入时间便于后期统计
             bigBottle.setCreateTime(BbDateTimeUtils.localDateTimeToDate(currentTime));
             this.save(bigBottle);
         });
     }
 
-    // 根据钱包地址获取最后十张上传的饮料数据
+    //从数据库中判断该小票是否有重复的
+    //todo 当前时间五秒前有相同数据, 判断为delete
+    private void setDeletFlag(Date retinfoReceiptTime, LocalDateTime currentTime, RetinfoDrink drink, BVefutureBigBottle bigBottle, String walletAddress) {
+        List<BVefutureBigBottle> bigBottleList;
+
+        LambdaQueryWrapper<BVefutureBigBottle> queryWrapper = new LambdaQueryWrapper<>();
+        //queryWrapper.eq(BVefutureBigBottle::getWalletAddress, walletAddress);
+        queryWrapper.eq(BVefutureBigBottle::getRetinfoReceiptTime, retinfoReceiptTime);
+        DateTime before5Sec = DateUtil.offsetSecond(BbDateTimeUtils.localDateTimeToDate(currentTime), -5);
+        //时间跨度
+        queryWrapper.le(BVefutureBigBottle::getCreateTime, before5Sec);
+        queryWrapper.eq(BVefutureBigBottle::getIsDelete, "0");
+        bigBottleList = baseMapper.selectList(queryWrapper);
+        if(CollectionUtil.isNotEmpty(bigBottleList)){
+            bigBottle.setIsDelete("1");
+        }
+    }
+
+    // 根据钱包地址获取最后十张上传的饮料数据 此时不管上传正确与否都查询出来
     public List<BVefutureBigBottle> getLastBigBottleList(String walletAddress, Integer lastNum) {
 
         LambdaQueryWrapper<BVefutureBigBottle> queryWrapper = new LambdaQueryWrapper<>();
@@ -230,6 +257,7 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         //查询最后的几个小票
         queryWrapper.eq(BVefutureBigBottle::getWalletAddress, walletAddress);
         queryWrapper.orderByDesc(BVefutureBigBottle::getId);
+        //queryWrapper.eq(BVefutureBigBottle::getIsDelete, 0);
 
         // 引入分页对象
         Page<BVefutureBigBottle> page = new Page<>(1, lastNum); // 当前页 = 1，每页条数 = 10
@@ -257,12 +285,22 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         if(CollectionUtil.isNotEmpty(lastBigBottles)){
             lastBigBottles.stream().forEach(bigBottle -> {
                 DrinkInfo drinkInfo = new DrinkInfo();
+
                 drinkInfo.setDrinkName(bigBottle.getRetinfoDrinkName());
                 drinkInfo.setDrinkAmout(bigBottle.getRetinfoDrinkAmout());
                 drinkInfo.setDrinkCapacity(bigBottle.getRetinfoDrinkCapacity());
+
                 //小票的上传时间 - 记入数据库的时间
                 drinkInfo.setReceiptUploadTime(bigBottle.getCreateTime());
-                drinkInfo.setPoints(pointStrategyContext.calculatePoints(bigBottle));
+                drinkInfo.setIsAvaild(bigBottle.getRetinfoIsAvaild());
+                drinkInfo.setIsTimeThreshold(bigBottle.getIsTimeThreshold());
+
+                String isDelete = bigBottle.getIsDelete();
+                drinkInfo.setIsDelete(!"0".equalsIgnoreCase(isDelete));
+                if("0".equalsIgnoreCase(isDelete)){
+                    drinkInfo.setPoints(pointStrategyContext.calculatePoints(bigBottle));
+                }
+
                 drinkInfos.add(drinkInfo);
             });
         }

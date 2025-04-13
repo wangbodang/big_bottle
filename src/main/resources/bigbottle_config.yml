@@ -6,9 +6,9 @@ bigbottle:
   coze:
     coze_url: https://api.coze.com/v1/workflow/run
     coze_workflow_id: 7482017874254037010  #可用的
-    coze_token: Bearer pat_lUnXXnZwd75NmjB5GIXtZAo6uR5rEhDziooiD2AxF9d12HFqTIFSV1uWKSRK8Bdd
+    coze_token: Bearer pat_Ajze2x0PeAooelnbBOZIlbQBQMrPEiq7Lcklt4auDlmnkTyWYmbUZMzDIQ2mUmxc
   counttimes:
     ##每天上传最大次数
     max: 10
     ##获取最后几张小票
-    lastnum: 10
+    lastnum: 5

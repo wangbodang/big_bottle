@@ -18,6 +18,12 @@ public class DrinkInfo {
     //小票上传时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo") //返回到前端时默认格式
     private Date receiptUploadTime;
+    //是否可用
+    private Boolean isAvaild;
+    //是否超期
+    private Boolean isTimeThreshold;
+    //是否删除
+    private Boolean isDelete;
     //积分
     Integer points;
 }
