@@ -238,7 +238,8 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
 
         // 获取分页结果
         List<BVefutureBigBottle> records = bVefutureBigBottlePage.getRecords();
-        List<BVefutureBigBottle> collect = records.stream().sorted(Comparator.comparing(BVefutureBigBottle::getId)).collect(Collectors.toList());
+        //注意， 用逆序排列数据
+        List<BVefutureBigBottle> collect = records.stream().sorted(Comparator.comparing(BVefutureBigBottle::getId).reversed()).collect(Collectors.toList());
         return collect;
     }
 
