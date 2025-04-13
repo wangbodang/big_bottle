@@ -1,15 +1,21 @@
 ##server config
 server:
   port: 8083
-  ##port: 443
-  ##ssl:
-    ##key-store: classpath:keystore.p12
-    ##key-store-password: 724102
-    ##key-store-type: PKCS12
-    ##key-alias: myalias
   servlet:
     context-path: /bigbottle
   address: 0.0.0.0
+
+##配置日志输出
+logging:
+  level:
+    root: info #全局目录
+    com.vefuture.big_bottle.web.vefuture: debug  # 指定包的日志级别
+    org.mybatis: trace
+    org.springframework.security: info
+  file:
+    # 定义日志文件的根目录，可以根据需要修改
+    path: ./logs
+  config: classpath:logback-spring.xml  # 指定使用自定义 logback 配置
 
 ##spring config
 spring:

@@ -1,4 +1,12 @@
-
+##server config
+#server:
+  #port: 8083
+    ##port: 443
+    ##ssl:
+    ##key-store: classpath:keystore.p12
+    ##key-store-password: 724102
+    ##key-store-type: PKCS12
+  ##key-alias: myalias
 
 jwt:
   secret: DBggVjX8FdEO8ckmVLpVjATP6t6OJFgeVIzfpDKSWLI=  # 示例密钥（必须是 Base64 编码，32 字节以上）

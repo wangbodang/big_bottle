@@ -4,9 +4,19 @@
   "description": "Every day, we contribute to plastic waste, often without realizing it. But simple choices can lead to significant change. Bigbootle is an innovative \"Eco-Action-to-Earn\" application that encourages and rewards you for choosing larger volume bottled beverages, helping to reduce plastic consumption right at the source and protect our planet together.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "commit": "git add . && npx cz"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "commitizen": "^4.3.1",
+    "cz-customizable": "^7.4.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-customizable"
+    }
+  }
 }
