@@ -10,8 +10,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.vefuture.big_bottle.common.config.BigBottleProperties;
-import com.vefuture.big_bottle.common.enums.ResultCode;
-import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.common.util.BbDateTimeUtils;
 import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import com.vefuture.big_bottle.common.vechain.BodyEntity;
@@ -194,16 +192,29 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
 
         RetinfoBigBottle bigBottle = JSON.parseObject(contentStr, RetinfoBigBottle.class);
 
+        //以当前时间作为插入时间
+        LocalDateTime currentTime = LocalDateTime.now();
         if(!bigBottle.getRetinfoIsAvaild()){
             log.info("---> 该票据信息不完整");
             //return ApiResponse.error(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
-            throw new BusinessException(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
+            //throw new BusinessException(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
+            saveNullReceiptToDb(walletAddress, imgUrl, currentTime);
+            return;
         }
 
         //todo 存到数据库
-        //以当前时间作为插入时间
-        LocalDateTime currentTime = LocalDateTime.now();
         saveToDb(walletAddress, imgUrl, bigBottle, currentTime);
+    }
+
+    //存储一个空的数据
+    private void saveNullReceiptToDb(String walletAddress, String imgUrl, LocalDateTime currentTime) {
+        BVefutureBigBottle bigBottle = new BVefutureBigBottle();
+        bigBottle.setWalletAddress(walletAddress);
+        bigBottle.setImgUrl(imgUrl);
+        bigBottle.setRetinfoIsAvaild(false);
+        bigBottle.setIsDelete("1");
+        bigBottle.setCreateTime(BbDateTimeUtils.localDateTimeToDate(currentTime));
+        this.save(bigBottle);
     }
 
     //存储到
