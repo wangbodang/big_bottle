@@ -1,15 +1,22 @@
 package com.vefuture.big_bottle.web.auth.controller;
 
 // AuthController.java
-import com.vefuture.big_bottle.common.util.JwtUtil;
-import com.vefuture.big_bottle.web.auth.entity.LoginUser;
+
+import com.vefuture.big_bottle.common.domain.ApiResponse;
+import com.vefuture.big_bottle.common.util.JwtTokenUtil;
+import com.vefuture.big_bottle.web.auth.entity.LoginRequest;
+import com.vefuture.big_bottle.web.auth.entity.LoginResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author wangb
@@ -18,36 +25,50 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
+@RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestParam String username, @RequestParam String password) {
-        Map<String, Object> result = new HashMap<>();
-        if ("admin".equals(username) && "123456".equals(password)) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        log.info("--->  loginRequest:[{}]", loginRequest);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
 
-            // 模拟从数据库查出的用户信息
-            LoginUser user = new LoginUser(
-                    1001L,
-                    "admin",
-                    "admin",
-                    Arrays.asList("read", "write", "delete"),
-                    "admin@example.com",
-                    true
-            );
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-            String token = jwtUtil.generateToken(user);
-            result.put("code", 200);
-            result.put("msg", "login success");
-            result.put("token", token);
-            return result;
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = jwtTokenUtil.generateToken(authentication);
+
+        return ResponseEntity.ok(new LoginResponse(token));
+    }
+
+    @PostMapping("/checkToken")
+    public ApiResponse<?> checkToken(HttpServletRequest request) {
+        log.info("---> 到达检查接口");
+        String token = resolveToken(request);
+        if (StringUtils.hasText(token) && jwtTokenUtil.validateToken(token)) {
+            String username = jwtTokenUtil.getUsernameFromToken(token);
+            return ApiResponse.success("Token 有效，用户：" + username);
+        } else {
+            return ApiResponse.unauthorized("Token 无效或已过期");
         }
+    }
 
-        result.put("code", 401);
-        result.put("msg", "Invalid credentials");
-        return result;
+    private String resolveToken(HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
+            String token = bearer.substring(7);
+            log.info("---> Token:[{}]", token);
+            return token;
+        }
+        return null;
     }
 }
 /*

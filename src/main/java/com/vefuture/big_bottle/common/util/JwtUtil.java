@@ -1,6 +1,6 @@
 package com.vefuture.big_bottle.common.util;
 
-import com.vefuture.big_bottle.common.config.JwtProperties;
+import com.vefuture.big_bottle.common.config.prop.JwtProperties;
 
 import com.vefuture.big_bottle.web.auth.entity.LoginUser;
 import io.jsonwebtoken.*;
@@ -26,7 +26,7 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        log.info("===> JWT配置的选项[{}]-[{}]", jwtProperties.getSecret(), jwtProperties.getExpire());
+        log.info("===> JWT配置的选项[{}]-[{}]", jwtProperties.getSecret(), jwtProperties.getExpiration());
         byte[] keyBytes = Base64.getDecoder().decode(jwtProperties.getSecret());
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -41,7 +41,7 @@ public class JwtUtil {
                 .claim("email", user.getEmail())
                 .claim("isAdmin", user.getIsAdmin())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpire()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration()))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.vefuture.big_bottle.common.config.BigBottleProperties;
+import com.vefuture.big_bottle.common.config.prop.BigBottleProperties;
 import com.vefuture.big_bottle.common.util.BbDateTimeUtils;
 import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import com.vefuture.big_bottle.common.vechain.BodyEntity;

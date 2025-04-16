@@ -3,7 +3,7 @@ package com.vefuture.big_bottle.web.vefuture.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.vefuture.big_bottle.common.config.BigBottleProperties;
+import com.vefuture.big_bottle.common.config.prop.BigBottleProperties;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BadRequestException;
@@ -20,8 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 

@@ -6,11 +6,25 @@ import com.vefuture.big_bottle.common.domain.RetResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<?>> handleAccessDenied(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.forbidden(ResultCode.FORBIDDEN.getMessage()));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<?>> handleAuth(AuthenticationException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.unauthorized(ResultCode.UNAUTHORIZED.getMessage()));
+    }
 
     @ExceptionHandler(BadRequestException.class)
     public ApiResponse<?> handleBadRequest(BadRequestException ex) {

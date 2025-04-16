@@ -1,4 +1,4 @@
-package com.vefuture.big_bottle.common.config;
+package com.vefuture.big_bottle.common.config.mybatis;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;

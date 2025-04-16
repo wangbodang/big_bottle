@@ -1,4 +1,4 @@
-package com.vefuture.big_bottle.common.config;
+package com.vefuture.big_bottle.common.config.prop;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

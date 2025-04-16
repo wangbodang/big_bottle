@@ -54,8 +54,11 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto  # 主键策略（自动增长）
-      logic-delete-value: 1  # 逻辑删除的值
-      logic-not-delete-value: 0
+      logic-delete-field: is_delete  # 逻辑删除字段名 (保持不变或按需修改)
+      logic-delete-value: "true"     # 值：表示已删除的值 (从 1 改为 true)
+      logic-not-delete-value: "false" # 值：表示未删除的值 (从 0 改为 false)
+      #logic-delete-value: 1  # 逻辑删除的值
+      #logic-not-delete-value: 0
 management:
   #server:
     #port: 8384  #如果设置该端口, 那么应用的context-path就不起作用了

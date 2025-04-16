@@ -29,7 +29,17 @@ public class ApiResponse<T> implements Serializable {
         this.data = data;
         this.timestamp = LocalDateTime.now();
     }
+    public static ApiResponse<?> forbidden(String msg) {
+        return error(ResultCode.FORBIDDEN.getCode(), msg);
+    }
 
+    public static ApiResponse<?> unauthorized(String msg) {
+        return error(ResultCode.UNAUTHORIZED.getCode(), msg);
+    }
+
+    public static ApiResponse<?> serverError(String msg) {
+        return error(500, msg);
+    }
     // 快捷返回成功结果
     public static <T> ApiResponse<T> success() {
         return new ApiResponse<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), null);

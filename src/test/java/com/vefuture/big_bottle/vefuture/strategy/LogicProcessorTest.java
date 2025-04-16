@@ -1,6 +1,6 @@
 package com.vefuture.big_bottle.vefuture.strategy;
 
-import com.vefuture.big_bottle.common.config.BigBottleProperties;
+import com.vefuture.big_bottle.common.config.prop.BigBottleProperties;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
 import com.vefuture.big_bottle.web.vefuture.service.impl.BigBottleLogicProcessor;
