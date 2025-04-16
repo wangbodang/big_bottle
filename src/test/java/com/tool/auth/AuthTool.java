@@ -34,7 +34,14 @@ public class AuthTool {
         System.out.println("匹配结果：" + match); // 应该打印 true
     }
 
-    //生成密码方法
+    //
+    /*
+        生成密码方法
+        等级	            强度	                推荐场景
+        🚀 10（默认）	快速、足够安全	    95% 的系统都适用
+        🛡️ 12～14	    更强	                金融、政务、隐私重要系统
+        💣 20+	        慢到炸裂	            仅用于科研或黑客训练营 👀
+    * */
     @Test
     public void test03(){
         String rawPassword = "BottleBig";
