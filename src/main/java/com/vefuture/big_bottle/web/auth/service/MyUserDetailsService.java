@@ -36,6 +36,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("===> 用户名为:[{}]", username);
         // 查询用户
         UserEntity user = usersService.lambdaQuery()
                 .eq(UserEntity::getUsername, username)
@@ -43,6 +44,7 @@ public class MyUserDetailsService implements UserDetailsService {
                 .one();
 
         if (user == null) {
+            log.info("===> 用户为null");
             throw new UsernameNotFoundException("用户不存在");
         }
         log.info("===>数据库密码:[{}]", user.getPassword());

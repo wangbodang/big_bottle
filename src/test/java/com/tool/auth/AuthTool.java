@@ -44,7 +44,7 @@ public class AuthTool {
     * */
     @Test
     public void test03(){
-        String rawPassword = "BottleBig";
+        String rawPassword = "123";
         String encodedPassword = new BCryptPasswordEncoder().encode(rawPassword);
         System.out.println("加密后的密码: " + encodedPassword);
     }

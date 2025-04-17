@@ -13,4 +13,9 @@ import com.vefuture.big_bottle.web.auth.entity.UserEntity;
  */
 public interface UsersService extends IService<UserEntity> {
 
+    // 假设这是创建用户的方法
+    void createUser(String username, String rawPassword);
+
+    // 验证密码的方法 (通常由 Spring Security 自动处理，但原理如下)
+    boolean checkPassword(String rawPassword, String encodedPasswordFromDb);
 }
