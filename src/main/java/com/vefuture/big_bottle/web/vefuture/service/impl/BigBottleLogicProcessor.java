@@ -218,7 +218,7 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         }
 
         //todo 存到数据库
-        saveToDb(walletAddress, imgUrl, bigBottle, currentTime);
+        saveToDb(process_id, walletAddress, imgUrl, bigBottle, currentTime);
     }
 
     //存储一个空的数据
@@ -232,13 +232,14 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         this.save(bigBottle);
     }
 
-    //存储到
-    private void saveToDb(String walletAddress, String imgUrl, RetinfoBigBottle retinfoBigBottle, LocalDateTime currentTime) {
+    //存储到数据库
+    private void saveToDb(String process_id, String walletAddress, String imgUrl, RetinfoBigBottle retinfoBigBottle, LocalDateTime currentTime) {
 
         ArrayList<RetinfoDrink> drinkList = retinfoBigBottle.getDrinkList();
         drinkList.forEach(drink -> {
             BVefutureBigBottle bigBottle = new BVefutureBigBottle();
             //公共信息
+            bigBottle.setProcessId(process_id);
             bigBottle.setWalletAddress(walletAddress.toLowerCase());
             bigBottle.setImgUrl(imgUrl);
             bigBottle.setRetinfoIsAvaild(retinfoBigBottle.getRetinfoIsAvaild());

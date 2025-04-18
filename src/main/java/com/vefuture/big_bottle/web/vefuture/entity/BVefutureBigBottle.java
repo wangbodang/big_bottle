@@ -33,6 +33,12 @@ public class BVefutureBigBottle implements Serializable {
     private Long id;
 
     /**
+     * 流程ID
+     */
+    @TableField("process_id")
+    private String processId;
+
+    /**
      * 钱包地址
      */
     @TableField("wallet_address")

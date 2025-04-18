@@ -1,7 +1,7 @@
 create table vefuture.b_vefuture_big_bottle
 (
-    id                     bigserial
-        primary key,
+    id                     bigserial    primary key,
+    process_id character(36) COLLATE pg_catalog."default",
     wallet_address         varchar(100) not null,
     img_url                text         not null,
     retinfo_is_availd      boolean,
@@ -22,6 +22,8 @@ create table vefuture.b_vefuture_big_bottle
 comment on table vefuture.b_vefuture_big_bottle is 'vefuture bigbottle 基本信息表';
 
 comment on column vefuture.b_vefuture_big_bottle.id is '主键长整型自增';
+
+comment on column vefuture.b_vefuture_big_bottle.process_id is '流程ID';
 
 comment on column vefuture.b_vefuture_big_bottle.wallet_address is '钱包地址';
 

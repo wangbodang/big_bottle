@@ -32,7 +32,7 @@ public class ProcessLogServiceImpl extends ServiceImpl<ProcessLogMapper, Process
         processLog.setUpdateTime(now);
         this.save(processLog);
         Long id = processLog.getId();
-        log.info("---> 生成的日志ID:[{}]", id);
+        log.info("---> ProcessId:[{}] 生成的日志ID:[{}]", processId, id);
         return id;
     }
 
