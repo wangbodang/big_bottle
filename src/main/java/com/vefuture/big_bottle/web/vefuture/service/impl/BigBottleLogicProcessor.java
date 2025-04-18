@@ -21,6 +21,7 @@ import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoLLMJson;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.DrinkInfo;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
+import com.vefuture.big_bottle.web.vefuture.service.IProcessLogService;
 import com.vefuture.big_bottle.web.vefuture.strategy.points.PointStrategyContext;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -48,6 +49,8 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
     private BigBottleProperties bigBottleProperties;
     @Autowired
     private PointStrategyContext pointStrategyContext;
+    @Autowired
+    private IProcessLogService processLogService;
     //从单例class获取
     //private final OkHttpClient client = new OkHttpClient();
     private final OkHttpClient client = OkHttpUtil.getClient();
@@ -159,13 +162,20 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         return count;
     }
 
-    public void sendReqAndSave(String walletAddress, String imgUrl) throws IOException {
+    /*
+        todo 此处添加上porcess_id用作全流程跟踪
+    */
+    public void sendReqAndSave(String process_id, String walletAddress, String imgUrl) throws IOException {
         //构造请求参数
         ParameterEntity parameterEntity = new ParameterEntity();
         parameterEntity.setImg_url(imgUrl);
         BodyEntity bodyEntity = new BodyEntity();
         bodyEntity.setWorkflow_id(bigBottleProperties.getCoze_workflow_id());
         bodyEntity.setParameters(parameterEntity);
+
+        //创建Log
+        Long processLogId = processLogService.createLog(process_id, walletAddress, imgUrl);
+
 
         // 3. 使用 Gson（或 Jackson 等）将实体转换为 JSON 字符串
         String jsonString = JSON.toJSONString(bodyEntity);
@@ -180,11 +190,16 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
                 .url(bigBottleProperties.getCoze_url())
                 .post(body)
                 .build();
-
+        //更新AI开始时间
+        processLogService.updateAiStartTime(processLogId, LocalDateTime.now());
+        //向AI模型发送请求并获取返回值
         Response response = client.newCall(request).execute();
-
+        //更新AI结束时间
+        processLogService.updateAiEndTime(processLogId, LocalDateTime.now());
         String retJsonString = response.body().string();
         log.info("---> 返回值为:{}", retJsonString);
+        //更新AI返回日志
+        processLogService.updateAiReturnMsg(processLogId, LocalDateTime.now(), retJsonString);
 
         RetinfoLLMJson retinfoLLMJson = JSON.parseObject(retJsonString, RetinfoLLMJson.class);
         String contentStr = retinfoLLMJson.getData();

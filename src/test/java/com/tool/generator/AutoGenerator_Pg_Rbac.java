@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
-import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
-import com.baomidou.mybatisplus.generator.config.GlobalConfig;
-import com.baomidou.mybatisplus.generator.config.ITypeConvert;
-import com.baomidou.mybatisplus.generator.config.OutputFile;
+import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.converts.PostgreSqlTypeConvert;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
@@ -16,6 +13,7 @@ import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import com.baomidou.mybatisplus.generator.config.TemplateType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,7 +100,7 @@ public class AutoGenerator_Pg_Rbac {
                 //包配置
                 .packageConfig(builder -> {
                     builder.parent("com.vefuture.big_bottle.web")     //父包名
-                            .moduleName("auth") // 设置父包模块名，这里一般不设置
+                            .moduleName("vefuture") // 设置父包模块名，这里一般不设置
                             .entity("entity")                 //Entity 包名
                             .service("service")             //	Service 包名
                             .serviceImpl("service.impl")    //Service Impl 包名
@@ -146,27 +144,24 @@ public class AutoGenerator_Pg_Rbac {
                             //.entityBuilder()
 
                 })
-
-                //设置生成哪些类
-                .templateEngine(new VelocityTemplateEngine()).templateConfig(builder -> {
-                    /*
-                    builder.controller("")
-                           .service("")
-                           .serviceImpl("")
-                           .mapper("")
-                           .mapperXml("");
-                    */
-
-                }).execute();
+                // … globalConfig、packageConfig、strategyConfig 略
+                .templateConfig(builder -> builder.disable(
+                        TemplateType.CONTROLLER,   // 不生成 Controller
+                        TemplateType.SERVICE,      // 不生成 Service 接口
+                        TemplateType.SERVICE_IMPL   // 不生成 ServiceImpl
+                ))
+                .templateEngine(new VelocityTemplateEngine())
+                .execute();
     }
 
     public List<String> getTabNameList(){
         String[] nameArr = new String[]{
-                "sys_users",
+                /*"sys_users",
                 "sys_roles",
                 "sys_user_roles",
                 "sys_resources",
-                "sys_role_resources"
+                "sys_role_resources"*/
+                "b_vef_process_log"
         };
         List<String> tempList = Arrays.asList(nameArr);
         List<String> result = new ArrayList<>();

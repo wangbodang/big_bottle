@@ -103,12 +103,12 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
-            <version>3.5.10.1</version>
+            <version>3.5.11</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-extension</artifactId>
-            <version>3.5.10.1</version>
+            <version>3.5.11</version>
         </dependency>
         <!-- jsqlparser（MyBatis-Plus 内部分页插件需要） -->
         <!--<dependency>

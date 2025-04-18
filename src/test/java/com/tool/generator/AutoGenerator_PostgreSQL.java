@@ -148,7 +148,8 @@ public class AutoGenerator_PostgreSQL {
                            .mapperXml("");
                     */
 
-                }).execute();
+                })
+                .execute();
     }
 
     public List<String> getTabNameList(){

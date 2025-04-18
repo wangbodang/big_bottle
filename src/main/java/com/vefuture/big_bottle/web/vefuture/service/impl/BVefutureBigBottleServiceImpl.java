@@ -8,6 +8,7 @@ import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BadRequestException;
 import com.vefuture.big_bottle.common.exception.BusinessException;
+import com.vefuture.big_bottle.common.util.UUIDCreator;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -160,12 +162,14 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     }
 
     /**
-     *
+     * 此处生成UUID, 作为porcess_id用作全流程跟踪
      * @param  reqBigBottleQo
      * @return  返回值说明
      */
     @Override
     public ApiResponse processReceipt(ReqBigBottleQo reqBigBottleQo) {
+        //此ID用作全流程跟踪ID
+        String process_id = UUIDCreator.getUuidV7().toString();
 
         //钱包地址和图片地址
         String walletAddress = reqBigBottleQo.getWalletAddress();
@@ -177,6 +181,9 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         }
         walletAddress = walletAddress.toLowerCase();
 
+        //存入流程记录表
+        
+
         Integer currDayCountByWalletAddress = bottleLogicProcessor.getCurrDayCountByWalletAddress(walletAddress);
         //判断今天上传次数是否达到最大次数
         if(currDayCountByWalletAddress >= countMax){
@@ -184,7 +191,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
             return ApiResponse.error(ResultCode.RECEIPT_MAX_SUBMIT_COUNT.getCode(), ResultCode.RECEIPT_MAX_SUBMIT_COUNT.getMessage());
         }
         try {
-            bottleLogicProcessor.sendReqAndSave(walletAddress, imgUrl);
+            bottleLogicProcessor.sendReqAndSave(process_id, walletAddress, imgUrl);
         } catch (BusinessException businessException){
             log.error("===> 业务异常:{}", businessException.getMessage());
             return ApiResponse.error(businessException.getCode(), businessException.getMessage());
