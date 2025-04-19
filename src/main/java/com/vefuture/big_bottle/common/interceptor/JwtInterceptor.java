@@ -19,7 +19,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
+        log.info("--------------------------------------->>>>>>>>> 经过拦截器:[{}]", this.getClass().getName());
         String token = request.getHeader("Authorization");
         log.info("===> Authorization Header: {}", token);
 

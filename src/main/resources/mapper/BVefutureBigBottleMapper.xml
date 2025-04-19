@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper">
+    <!-- 分组把当期用户的小票都查询出来 -->
+    <select id="getManageBigBottleList" resultType="com.vefuture.big_bottle.web.vefuture.entity.vo.ManageBigBottleVo">
+        select min(t.id),
+               t.wallet_address,
+               t.img_url,
+               bool_and(t.retinfo_is_availd) retinfo_is_availd,
+               bool_and(t.is_time_threshold) is_time_threshold,
+               count(t.retinfo_drink_name) drink_count,
+               sum(t.retinfo_drink_capacity) drink_capacity,
+               sum(t.retinfo_drink_amout) drink_amount,
+               max(t.retinfo_receipt_time) retinfo_receipt_time,
+               max(t.create_time) create_time
+        from  b_vefuture_big_bottle t
+        group by t.wallet_address, t.img_url
+        order by min(t.id) desc
+    </select>
+    <!-- 查询出总条数 -->
+    <select id="getManageBigBottleCount" resultType="Long">
+        select count(1)
+        from (
+                 select min(t.id),
+                        t.wallet_address,
+                        t.img_url
 
+                 from  b_vefuture_big_bottle t
+                 group by t.wallet_address, t.img_url
+             ) s
+    </select>
 </mapper>

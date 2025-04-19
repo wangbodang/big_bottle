@@ -1,6 +1,8 @@
 package com.vefuture.big_bottle.common.filter;
 
+import com.vefuture.big_bottle.common.util.IpUtils;
 import com.vefuture.big_bottle.common.util.JwtTokenUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +24,7 @@ import java.io.IOException;
  * @date 2025/4/16
  * @description TODO: 类描述
  */
+@Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -37,6 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String token = resolveToken(request);
+        log.info("--------------------------------------->>>>>>>>> 经过过滤器:[{}]", this.getFilterName());
+        String uri = request.getRequestURI();
+        String ip = IpUtils.getClientIp(request);
+        log.info("请求路径：{}，来源IP：{}", uri, ip);
 
         if (StringUtils.hasText(token) && jwtTokenUtil.validateToken(token)) {
             String username = jwtTokenUtil.getUsernameFromToken(token);

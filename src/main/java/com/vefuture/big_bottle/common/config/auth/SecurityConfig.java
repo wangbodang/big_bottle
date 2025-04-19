@@ -49,7 +49,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and()
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**", "/public/**", "/vefuture/**")
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**", "/public/**", "/vefuture/**", "/employee/**")
                                                 .permitAll()
                                                 .anyRequest().authenticated()
                 )
