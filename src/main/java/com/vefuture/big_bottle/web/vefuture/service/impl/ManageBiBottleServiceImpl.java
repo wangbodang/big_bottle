@@ -28,6 +28,12 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
     public Page<ManageBigBottleVo> getBigBottleList(HttpServletRequest request, Page<ManageBigBottleVo> page, ReqBigBottleQo qo) {
 
         List<ManageBigBottleVo> manageBigBottleVoList = bigBottleMapper.getManageBigBottleList(page, qo);
+        //设置图像名字
+        manageBigBottleVoList.forEach(manageBigBottleVo -> {
+            String imgUrl = manageBigBottleVo.getImgUrl();
+            manageBigBottleVo.setImgName(imgUrl.substring(imgUrl.lastIndexOf("/")+1));
+        });
+
         page.setRecords(manageBigBottleVoList);
         Long total = bigBottleMapper.getManageBigBottleCount(qo);
         page.setTotal(total);

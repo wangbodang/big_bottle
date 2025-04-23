@@ -36,8 +36,8 @@ public class ManageBigBottleController {
     @RequestMapping(value = "/bigbottlelist", method = RequestMethod.POST)
     public ApiResponse<Page<ManageBigBottleVo>> getBigBottleList(HttpServletRequest request,
                                            HttpServletResponse response,
-                                           Page<ManageBigBottleVo> page, @RequestBody ReqBigBottleQo qo){
-        log.info("---> 查询管理BigBottle列表:[{}]", qo);
+                                           Page<ManageBigBottleVo> page, ReqBigBottleQo qo){
+        log.info("---> 查询管理BigBottle列表:page:[{}], qo:[{}]", page, qo);
         Page<ManageBigBottleVo> manageBigBottleVoList = manageBiBottleService.getBigBottleList(request, page, qo);
 
         return ApiResponse.success(manageBigBottleVoList);

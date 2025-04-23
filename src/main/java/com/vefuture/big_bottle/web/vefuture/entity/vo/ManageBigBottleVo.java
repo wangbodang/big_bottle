@@ -21,6 +21,7 @@ public class ManageBigBottleVo {
     private String processId;
     private String walletAddress;
     private String imgUrl;
+    private String imgName;
     private Boolean retinfoIsAvaild;
     private Boolean isTimeThreshold;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") //接收前端传过来的数据时

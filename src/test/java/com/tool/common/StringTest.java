@@ -18,4 +18,10 @@ public class StringTest {
         System.out.println(walletAddress.toLowerCase());
 
     }
+
+    @Test void testSubstring(){
+        String imgUrl = "https://victor-oss.oss-cn-shanghai.aliyuncs.com/uPic/CleanShot 2025-03-15 at 21.14.01@2x.png";
+        String imgName = imgUrl.substring(imgUrl.lastIndexOf("/")+1);
+        log.info("---> imgName:[{}]", imgName);
+    }
 }

@@ -1,6 +1,6 @@
 package com.vefuture.big_bottle.common.filter;
 
-import com.vefuture.big_bottle.common.util.IpUtils;
+import com.vefuture.big_bottle.common.util.ip.IpUtils;
 import com.vefuture.big_bottle.common.util.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         log.info("--------------------------------------->>>>>>>>> 经过过滤器:[{}]", this.getFilterName());
         String uri = request.getRequestURI();
-        String ip = IpUtils.getClientIp(request);
+        String ip = IpUtils.getIpAddr(request);
         log.info("请求路径：{}，来源IP：{}", uri, ip);
 
         if (StringUtils.hasText(token) && jwtTokenUtil.validateToken(token)) {

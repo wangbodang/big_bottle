@@ -1,6 +1,7 @@
 package com.vefuture.big_bottle.common.config;
 
 // WebConfig.java
+import com.vefuture.big_bottle.common.interceptor.AccessLogInterceptor;
 import com.vefuture.big_bottle.common.interceptor.JwtInterceptor;
 import com.vefuture.big_bottle.common.interceptor.VefutureInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,14 @@ public class WebConfig implements WebMvcConfigurer {
     private JwtInterceptor jwtInterceptor;
     @Autowired
     private VefutureInterceptor vefutureInterceptor;
+    @Autowired
+    private AccessLogInterceptor accessLogInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        //拦截所有的请求, 记录日志
+        registry.addInterceptor(accessLogInterceptor)
+                .addPathPatterns("/**");
         registry.addInterceptor(jwtInterceptor)
                 //.addPathPatterns("/**")  // 默认拦所有
                 //.addPathPatterns("/api/**", "/employee/**")

@@ -1,6 +1,6 @@
 package com.vefuture.big_bottle.common.interceptor;
 
-import com.vefuture.big_bottle.common.util.IpUtils;
+import com.vefuture.big_bottle.common.util.ip.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -21,7 +21,7 @@ public class VefutureInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("--------------------------------------->>>>>>>>> 经过拦截器:[{}]", this.getClass().getName());
         String uri = request.getRequestURI();
-        String ip = IpUtils.getClientIp(request);
+        String ip = IpUtils.getIpAddr(request);
         log.info("[VefutureInterceptor] 请求路径：{}，来源IP：{}", uri, ip);
         log.info("---> 请求经过拦截器:{}", this.getClass().getName());
         //默认返回true

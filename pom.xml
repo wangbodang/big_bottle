@@ -33,6 +33,7 @@
         <project.artifactId>${project.artifactId}</project.artifactId>
         <project.version>${project.version}</project.version>
         <project.groupId>${project.groupId}</project.groupId>
+        <bitwalker.version>1.21</bitwalker.version>
     </properties>
     <dependencies>
         <dependency>
@@ -211,10 +212,17 @@
             <artifactId>tomcat-embed-websocket</artifactId>
         </dependency>
         <!-- 识别图片Exif信息 -->
+        <!--
         <dependency>
             <groupId>com.drewnoakes</groupId>
             <artifactId>metadata-extractor</artifactId>
             <version>2.18.0</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.drewnoakes</groupId>
+            <artifactId>metadata-extractor</artifactId>
+            <version>2.19.0</version>
         </dependency>
         <!--jjwt -->
         <dependency>
@@ -227,7 +235,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-
+        <!-- 解析客户端操作系统、浏览器等 -->
+        <dependency>
+            <groupId>eu.bitwalker</groupId>
+            <artifactId>UserAgentUtils</artifactId>
+            <version>${bitwalker.version}</version>
+        </dependency>
 
 
     </dependencies>
