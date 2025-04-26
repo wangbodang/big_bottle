@@ -22,7 +22,7 @@ public class AfterStartTestConfigService implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("---> 测试启动后执行...");
-        log.info("---> 参数测试 url:[{}]workflow_id:[{}],token:[{}]", bigBottleProperties.getCoze_url(), bigBottleProperties.getCoze_workflow_id(), bigBottleProperties.getCoze_token());
+        log.info("---> 参数测试 url:[{}]workflow_id:[{}],token:[{}]", bigBottleProperties.getCoze().getCoze_url(), bigBottleProperties.getCoze().getCoze_workflow_id(), bigBottleProperties.getCoze().getCoze_token());
         log.info("---> 参数测试 countMax:[{}]", countMax);
 
     }

@@ -191,7 +191,9 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
             return ApiResponse.error(ResultCode.RECEIPT_MAX_SUBMIT_COUNT.getCode(), ResultCode.RECEIPT_MAX_SUBMIT_COUNT.getMessage());
         }
         try {
-            bottleLogicProcessor.sendReqAndSave(process_id, walletAddress, imgUrl);
+            //coze dify
+            String llm = "dify";
+            bottleLogicProcessor.sendReqAndSave(process_id, walletAddress, imgUrl, llm);
         } catch (BusinessException businessException){
             log.error("===> 业务异常:{}", businessException.getMessage());
             return ApiResponse.error(businessException.getCode(), businessException.getMessage());

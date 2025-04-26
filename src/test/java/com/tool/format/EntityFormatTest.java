@@ -1,8 +1,8 @@
 package com.tool.format;
 
 import com.alibaba.fastjson.JSON;
-import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoBigBottle;
-import com.vefuture.big_bottle.web.vefuture.entity.llm_ret.RetinfoDrink;
+import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RetinfoBigBottle;
+import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RetinfoDrink;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 

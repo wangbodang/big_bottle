@@ -1,4 +1,4 @@
-package com.vefuture.big_bottle.web.vefuture.entity.llm_ret;
+package com.vefuture.big_bottle.web.vefuture.strategy.llm.coze.entity;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @description TODO: 类描述
  */
 @Data
-public class RetinfoLLMJson {
+public class RetinfoCozeJson {
     private Integer code;
     private String cost;
     //返回的饮料消息字符串

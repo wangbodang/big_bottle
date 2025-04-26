@@ -49,9 +49,29 @@ comment on column vefuture.b_vefuture_big_bottle.update_id is '修改人ID';
 
 comment on column vefuture.b_vefuture_big_bottle.is_time_threshold is '布尔值，用来检验小票时间和上传到系统时间的差值（比如我们规定小票时间是本周内的，就需要做这个判断）';
 
+
 alter table vefuture.b_vefuture_big_bottle
     owner to postgres;
 
 create index index_wallet_address
     on vefuture.b_vefuture_big_bottle (wallet_address);
 
+--  =================================
+
+ALTER TABLE IF EXISTS vefuture.b_vefuture_big_bottle
+    ADD COLUMN de_plastic numeric(18, 4);
+
+COMMENT ON COLUMN vefuture.b_vefuture_big_bottle.de_plastic
+    IS '减塑量';
+
+ALTER TABLE IF EXISTS vefuture.b_vefuture_big_bottle
+    ADD COLUMN exif_type integer;
+
+COMMENT ON COLUMN vefuture.b_vefuture_big_bottle.exif_type
+    IS '根据Exif判断图片的类型 目前：0-AI_GENERATED, 1-CAMERA_CAPTURE,2-UNKNOWN';
+
+ALTER TABLE IF EXISTS vefuture.b_vefuture_big_bottle
+    ADD COLUMN exif_device_type integer;
+
+COMMENT ON COLUMN vefuture.b_vefuture_big_bottle.exif_device_type
+    IS '根据EXIF推测设备类型:0-AI_GENERATOR, 1-SMARTPHONE, 2-MIRRORLESS_DSLR, 3-ACTION_CAM, 4-UNKNOWN';

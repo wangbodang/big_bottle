@@ -138,19 +138,9 @@ public class ImageExifTest {
         String  imgFileName = "ai_02.png";
         //String  imgFileName = "IMG_20250331_230309.jpg"; //小米的
         //String  imgFileName = "papasu.jpg";
-        try {
-            ImageSourceDetector.ImageOrigin detect = ImageSourceDetector.detectOrigin(new File(imgPath + imgFileName));
-            log.info("---> imgFileName:[{}] === [{}]", imgFileName, detect);
+        /*ImageSourceDetector.ImageOrigin detect = ImageSourceDetector.detectOrigin(new File(imgPath + imgFileName));
+        log.info("---> imgFileName:[{}] === [{}]", imgFileName, detect);*/
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.error("---> 异常:[{}]", e.getMessage());
-            throw new RuntimeException(e);
-        } catch (ImageProcessingException e) {
-            e.printStackTrace();
-            log.error("---> 异常:[{}]", e.getMessage());
-            throw new RuntimeException(e);
-        }
     }
 
     /* 判断网络文件 */
@@ -170,14 +160,12 @@ public class ImageExifTest {
         imgList.stream().forEach(imageUrl ->{
             try {
                 URL url = new URL(imageUrl);
-                ImageSourceDetector.ImageOrigin detect = ImageSourceDetector.detectOrigin(url.openStream());
-                ImageSourceDetector.DeviceType deviceType = ImageSourceDetector.detectDeviceType(url.openStream());
-                log.info("-->{} - {} - {}", imageUrl.substring(imageUrl1.lastIndexOf("/")+1), detect, deviceType);
+//                ImageSourceDetector.ImageOrigin detect = ImageSourceDetector.detectOrigin(url.openStream());
+//                ImageSourceDetector.DeviceType deviceType = ImageSourceDetector.detectDeviceType(url.openStream());
+//                log.info("-->{} - {} - {}", imageUrl.substring(imageUrl1.lastIndexOf("/")+1), detect, deviceType);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ImageProcessingException e) {
                 throw new RuntimeException(e);
             }
         });

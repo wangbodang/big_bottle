@@ -8,6 +8,7 @@ import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -88,6 +89,24 @@ public class BVefutureBigBottle implements Serializable {
     //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo") //返回到前端时默认格式
     private Date retinfoReceiptTime;
+
+    /**
+     * 减塑量
+     */
+    @TableField("de_plastic")
+    private BigDecimal dePlastic;
+
+    /**
+     * 根据Exif判断图片的类型 目前：0-AI_GENERATED, 1-CAMERA_CAPTURE,2-UNKNOWN
+     */
+    @TableField("exif_type")
+    private Integer exifType;
+
+    /**
+     * 根据EXIF推测设备类型:0-AI_GENERATOR, 1-SMARTPHONE, 2-MIRRORLESS_DSLR, 3-ACTION_CAM, 4-UNKNOWN
+     */
+    @TableField("exif_device_type")
+    private Integer exifDeviceType;
 
     /**
      * 备注

@@ -12,6 +12,8 @@ import java.util.concurrent.*;
  * @description TODO: 类描述
  */
 public class OkHttpUtil {
+
+    /// 全局唯一 OkHttpClient 实例，线程安全，推荐单例使用
     private static final OkHttpClient CLIENT;
 
     static {

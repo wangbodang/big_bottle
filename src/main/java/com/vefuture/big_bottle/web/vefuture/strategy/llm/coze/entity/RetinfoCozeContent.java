@@ -1,4 +1,4 @@
-package com.vefuture.big_bottle.web.vefuture.entity.llm_ret;
+package com.vefuture.big_bottle.web.vefuture.strategy.llm.coze.entity;
 
 import lombok.Data;
 
@@ -8,6 +8,6 @@ import lombok.Data;
  * @description TODO: 类描述
  */
 @Data
-public class RetinfoLLMContent {
+public class RetinfoCozeContent {
     private String receiptContent;
 }

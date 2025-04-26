@@ -2,8 +2,8 @@ package com.vechain;
 
 import cn.hutool.core.date.StopWatch;
 import com.alibaba.fastjson.JSON;
-import com.vefuture.big_bottle.common.vechain.BodyEntity;
-import com.vefuture.big_bottle.common.vechain.ParameterEntity;
+import com.vefuture.big_bottle.web.vefuture.strategy.llm.coze.entity.BodyEntity;
+import com.vefuture.big_bottle.web.vefuture.strategy.llm.coze.entity.ParameterEntity;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.junit.jupiter.api.Test;
