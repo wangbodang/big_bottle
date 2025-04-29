@@ -15,6 +15,9 @@ import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CountLimitVo;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
+import com.vefuture.big_bottle.web.vefuture.service.task.AsyncProcessTask;
+import com.vefuture.big_bottle.web.websocket.WsSessionManager;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,12 +38,14 @@ import java.util.concurrent.ExecutorService;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor        // Lombok 自动生成带 @Autowired 的构造器
 public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottleMapper, BVefutureBigBottle> implements BVefutureBigBottleService {
 
     @Autowired
     private BigBottleProperties bigBottleProperties;
     @Autowired
     private BigBottleLogicProcessor bottleLogicProcessor;
+    private final WsSessionManager ws;
     @Autowired
     private ExecutorService threadPoolExecutor;
     @Value("${bigbottle.counttimes.max:10}")
@@ -174,6 +179,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         //钱包地址和图片地址
         String walletAddress = reqBigBottleQo.getWalletAddress();
         String imgUrl = reqBigBottleQo.getImgUrl();
+        threadPoolExecutor.submit(new AsyncProcessTask(process_id, ws, walletAddress, imgUrl));
         if(StrUtil.isBlank(walletAddress) || StrUtil.isBlank(imgUrl)){
             log.info("---> 缺失参数 walletAddress imgUrl都不能为空");
             throw new BadRequestException(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(),

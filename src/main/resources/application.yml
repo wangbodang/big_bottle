@@ -12,6 +12,7 @@ logging:
     com.vefuture.big_bottle.web.vefuture: debug  # 指定包的日志级别
     org.mybatis: trace
     org.springframework.security: info
+    org.springframework.web.socket: DEBUG
   file:
     # 定义日志文件的根目录，可以根据需要修改
     path: ./logs
@@ -59,6 +60,14 @@ mybatis-plus:
       logic-not-delete-value: "false" # 值：表示未删除的值 (从 0 改为 false)
       #logic-delete-value: 1  # 逻辑删除的值
       #logic-not-delete-value: 0
+##线程池配置参数
+task:
+  pool:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 1000
+    keep-alive-seconds: 300
+### 系统监控配置参数
 management:
   #server:
     #port: 8384  #如果设置该端口, 那么应用的context-path就不起作用了

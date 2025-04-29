@@ -1,6 +1,7 @@
 package com.vefuture.big_bottle.web.vefuture.controller;
 
 
+import cn.hutool.core.date.DateUtil;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BusinessException;
@@ -9,13 +10,16 @@ import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CountLimitVo;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
+import com.vefuture.big_bottle.web.websocket.WsSessionManager;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -33,6 +37,11 @@ public class BVefutureBigBottleController {
 
     @Resource
     private BVefutureBigBottleService bigBottleService;
+
+    private final WsSessionManager ws;
+    public BVefutureBigBottleController(WsSessionManager ws) {
+        this.ws = ws;
+    }
 
 
     /**
@@ -91,6 +100,8 @@ public class BVefutureBigBottleController {
         try {
             Optional<BVefutureBigBottle> optById = bigBottleService.getOptById(1);
             log.info("---> 查询数据成功:{}", optById);
+            // 推送给指定用户
+            ws.sendToUser("U42", "图片处理任务已完成 code:200; time:"+ DateUtil.formatDateTime(new Date()));
             return ApiResponse.success(optById);
         } catch (Exception e) {
             log.error("---> 查询数据异常:{}", e.getMessage());
