@@ -12,11 +12,13 @@ import com.drew.imaging.ImageProcessingException;
 import com.vefuture.big_bottle.common.util.BbDateTimeUtils;
 import com.vefuture.big_bottle.common.util.ImageSourceDetector;
 import com.vefuture.big_bottle.common.util.OkHttpUtil;
+import com.vefuture.big_bottle.common.util.task.TaskManager;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.DrinkInfo;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
 import com.vefuture.big_bottle.web.vefuture.service.IProcessLogService;
+import com.vefuture.big_bottle.web.vefuture.service.task.AsyncProcessReceiptTask;
 import com.vefuture.big_bottle.web.vefuture.strategy.deplast.DeplastStrategyContext;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.LlmContext;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.LlmStrategy;
@@ -24,6 +26,8 @@ import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RequestModel;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RetinfoBigBottle;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RetinfoDrink;
 import com.vefuture.big_bottle.web.vefuture.strategy.points.PointStrategyContext;
+import com.vefuture.big_bottle.web.websocket.WsSessionManager;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMapper, BVefutureBigBottle>{
 
 
@@ -54,6 +59,9 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
     private DeplastStrategyContext deplastStrategyContext;
     @Autowired
     private IProcessLogService processLogService;
+    private final WsSessionManager ws;
+    private final TaskManager taskManager; // 注入TaskManager
+
 
     //从单例class获取
     //private final OkHttpClient client = new OkHttpClient();
@@ -167,7 +175,8 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
     }
 
     /*
-        todo 此处添加上porcess_id用作全流程跟踪
+      此处添加上porcess_id用作全流程跟踪
+      todo 用异步处理图片上传
     */
     public void sendReqAndSave(String process_id, String walletAddress, String imgUrl, String llm) throws IOException {
 
@@ -180,87 +189,19 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         //使用策略模式调用方法
         LlmStrategy llmStrategy = llmStrategyMap.get(llm);
         llmContext.setStrategy(llmStrategy);
-        RetinfoBigBottle retinfoBigBottle = llmStrategy.call(requestModel);
 
-        //以当前时间作为插入时间
-        LocalDateTime currentTime = LocalDateTime.now();
-        if(!retinfoBigBottle.getRetinfoIsAvaild()){
-            log.info("---> 该票据信息不完整");
-            //return ApiResponse.error(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
-            //throw new BusinessException(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
-            //存一个空信息到库里
-            saveNullReceiptToDb(walletAddress, imgUrl, currentTime);
-            return;
+        //此处开始使用异步处理图片
+        BVefutureBigBottleMapper mapper = this.getBaseMapper();
+        if (mapper == null) {
+            log.error("===> 拿不到Mapper！！！！");
+            throw new IllegalStateException("Mapper注入失败！");
         }
+        AsyncProcessReceiptTask asycTask = new AsyncProcessReceiptTask(requestModel, ws, mapper, llmStrategy, deplastStrategyContext);
+        taskManager.submitTask(process_id, asycTask);
 
-        //todo 存到数据库 此处处理ExifInfo及减塑量的问题
-        ImageSourceDetector.DetectionResult detectionResult = new ImageSourceDetector.DetectionResult(ImageSourceDetector.ImageOrigin.UNKNOWN, ImageSourceDetector.DeviceType.UNKNOWN);
-        try {
-            detectionResult = ImageSourceDetector.detect(imgUrl);
-        } catch (ImageProcessingException e) {
-            log.error("===> 判定图片Exif信息异常:{}", e.getMessage());
-        }
-        saveToDb(process_id, walletAddress, imgUrl, retinfoBigBottle, currentTime, detectionResult);
-    }
+        //RetinfoBigBottle retinfoBigBottle = llmStrategy.call(requestModel);
 
-    //存储一个空的数据
-    private void saveNullReceiptToDb(String walletAddress, String imgUrl, LocalDateTime currentTime) {
-        BVefutureBigBottle bigBottle = new BVefutureBigBottle();
-        bigBottle.setWalletAddress(walletAddress);
-        bigBottle.setImgUrl(imgUrl);
-        bigBottle.setRetinfoIsAvaild(false);
-        bigBottle.setIsDelete("1");
-        bigBottle.setCreateTime(BbDateTimeUtils.localDateTimeToDate(currentTime));
-        this.save(bigBottle);
-    }
 
-    //存储到数据库
-    private void saveToDb(String process_id, String walletAddress, String imgUrl, RetinfoBigBottle retinfoBigBottle, LocalDateTime currentTime, ImageSourceDetector.DetectionResult detectionResult) {
-
-        ArrayList<RetinfoDrink> drinkList = retinfoBigBottle.getDrinkList();
-        drinkList.forEach(drink -> {
-            BVefutureBigBottle bigBottle = new BVefutureBigBottle();
-            //公共信息
-            bigBottle.setProcessId(process_id);
-            bigBottle.setWalletAddress(walletAddress.toLowerCase());
-            bigBottle.setImgUrl(imgUrl);
-            bigBottle.setRetinfoIsAvaild(retinfoBigBottle.getRetinfoIsAvaild());
-            bigBottle.setRetinfoReceiptTime(retinfoBigBottle.getRetinfoReceiptTime());
-            bigBottle.setIsTimeThreshold(retinfoBigBottle.getTimeThreshold());
-            //Exif信息
-            bigBottle.setExifType(detectionResult.getOrigin().getCode());
-            bigBottle.setExifDeviceType(detectionResult.getDeviceType().getCode());
-            //饮料信息
-            bigBottle.setRetinfoDrinkName(drink.getRetinfoDrinkName());
-            bigBottle.setRetinfoDrinkCapacity(drink.getRetinfoDrinkCapacity());
-            bigBottle.setRetinfoDrinkAmout(drink.getRetinfoDrinkAmout());
-            //减塑量
-            bigBottle.setDePlastic(deplastStrategyContext.caculDeplast(bigBottle));
-
-            //根据该数据是否在数据库有记录判断是否为有效数据 isDelete = 1 为无效数据
-            setDeletFlag(retinfoBigBottle.getRetinfoReceiptTime(), currentTime, drink, bigBottle, walletAddress);
-            //一张小票用统一一个插入时间便于后期统计
-            bigBottle.setCreateTime(BbDateTimeUtils.localDateTimeToDate(currentTime));
-            this.save(bigBottle);
-        });
-    }
-
-    //从数据库中判断该小票是否有重复的
-    //todo 当前时间五秒前有相同数据, 判断为delete
-    private void setDeletFlag(Date retinfoReceiptTime, LocalDateTime currentTime, RetinfoDrink drink, BVefutureBigBottle bigBottle, String walletAddress) {
-        List<BVefutureBigBottle> bigBottleList;
-
-        LambdaQueryWrapper<BVefutureBigBottle> queryWrapper = new LambdaQueryWrapper<>();
-        //queryWrapper.eq(BVefutureBigBottle::getWalletAddress, walletAddress);
-        queryWrapper.eq(BVefutureBigBottle::getRetinfoReceiptTime, retinfoReceiptTime);
-        DateTime before5Sec = DateUtil.offsetSecond(BbDateTimeUtils.localDateTimeToDate(currentTime), -5);
-        //时间跨度
-        queryWrapper.le(BVefutureBigBottle::getCreateTime, before5Sec);
-        queryWrapper.eq(BVefutureBigBottle::getIsDelete, "0");
-        bigBottleList = baseMapper.selectList(queryWrapper);
-        if(CollectionUtil.isNotEmpty(bigBottleList)){
-            bigBottle.setIsDelete("1");
-        }
     }
 
     // 根据钱包地址获取最后十张上传的饮料数据 此时不管上传正确与否都查询出来

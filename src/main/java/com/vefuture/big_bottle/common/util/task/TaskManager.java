@@ -18,6 +18,11 @@ import java.util.concurrent.*;
  * @author wangb
  * @date 2025/4/29
  * @description 任务管理器
+ * submitTask的时候附带超时参数（比如超5分钟自动取消）；
+ *
+ * submitTask返回一个【异步监听器】，任务完成后自动回调处理；
+ *
+ * 如何在页面（前端）上实时轮询任务进度（比如拿taskId查询状态）？
  */
 @Slf4j
 @Component
@@ -27,7 +32,7 @@ public class TaskManager {
     private final Map<String, TaskInfo> taskStatusMap = new ConcurrentHashMap<>();
     private final Map<String, Future<?>> taskFutureMap = new ConcurrentHashMap<>();
     @Qualifier(value = "threadPoolTaskExecutor")
-    private ThreadPoolTaskExecutor executor;
+    private final ThreadPoolTaskExecutor executor;
 
     //自己创建一个线程池
     /*

@@ -15,7 +15,6 @@ import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CountLimitVo;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
-import com.vefuture.big_bottle.web.vefuture.service.task.AsyncProcessTask;
 import com.vefuture.big_bottle.web.websocket.WsSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -175,11 +173,9 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     public ApiResponse processReceipt(ReqBigBottleQo reqBigBottleQo) {
         //此ID用作全流程跟踪ID
         String process_id = UUIDCreator.getUuidV7().toString();
-
-        //钱包地址和图片地址
-        String walletAddress = reqBigBottleQo.getWalletAddress();
         String imgUrl = reqBigBottleQo.getImgUrl();
-        threadPoolExecutor.submit(new AsyncProcessTask(process_id, ws, walletAddress, imgUrl));
+        String walletAddress = reqBigBottleQo.getWalletAddress();
+
         if(StrUtil.isBlank(walletAddress) || StrUtil.isBlank(imgUrl)){
             log.info("---> 缺失参数 walletAddress imgUrl都不能为空");
             throw new BadRequestException(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(),
@@ -187,10 +183,9 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         }
         walletAddress = walletAddress.toLowerCase();
 
-        //存入流程记录表
-        
-
+        //获取当天上传的次数
         Integer currDayCountByWalletAddress = bottleLogicProcessor.getCurrDayCountByWalletAddress(walletAddress);
+
         //判断今天上传次数是否达到最大次数
         if(currDayCountByWalletAddress >= countMax){
             log.info("---> 今天上传次数为:[{}], 已到达最大次数", currDayCountByWalletAddress);
