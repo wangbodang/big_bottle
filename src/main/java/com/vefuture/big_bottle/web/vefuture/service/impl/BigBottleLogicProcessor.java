@@ -152,7 +152,7 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         DateTime beginOfDay = DateUtil.beginOfDay(currentTime);
 
         //获取当天的小票列 表
-        List<BVefutureBigBottle> bigBottles = getBigBottleListByTimeOffset(walletAddress, beginOfDay, currentTime, true, false, "0");
+        List<BVefutureBigBottle> bigBottles = getBigBottleListByTimeOffset(walletAddress, beginOfDay, currentTime, null, null, null);
         if(CollectionUtil.isEmpty(bigBottles)) {
             return 0;
         }
