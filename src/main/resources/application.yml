@@ -81,3 +81,8 @@ management:
         include: "*"         # 暴露所有启用的 Web 端点 (开发时常用，生产需谨慎)
         # exclude: env,beans # 可以用 exclude 来排除某些端点
       base-path: /actuator #/monitor 这个地方可以设置其他路径
+##配置websocket
+websocket:
+  allowed-origins:
+    - http://localhost:3000
+    - http://127.0.0.1:5500

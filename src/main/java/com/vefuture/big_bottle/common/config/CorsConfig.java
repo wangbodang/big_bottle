@@ -1,13 +1,12 @@
 package com.vefuture.big_bottle.common.config;
 
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * 允许跨域调用
  */
-@Configuration
+//@Configuration
 public class CorsConfig implements WebMvcConfigurer{
     /*@Bean
     public WebMvcConfigurer corsConfigurer() {
