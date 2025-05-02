@@ -31,7 +31,7 @@ By joining Bigbootle, you will:
     * Drink Volume 700ml to < 2000ml = **10 Points**
     * Drink Volume ≥ 2000ml = **15 Points**
 * **Share the Weekly $B3TR Pool:** Each week, we distribute $B3TR tokens to users based on the proportion of points they earned compared to the total points earned by all users that week. The greater your contribution, the more rewards you receive!
-* **Reward Cap:** To encourage broader participation, each user can earn a maximum of **300 $B3TR** per week.
+* **Reward Cap:** To encourage broader participation, each user can earn a maximum of **50 $B3TR** per week.
 
 ## Trust and Transparency Drive a Green Future
 
