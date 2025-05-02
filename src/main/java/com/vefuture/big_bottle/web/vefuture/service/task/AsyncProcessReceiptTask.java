@@ -53,10 +53,10 @@ public class AsyncProcessReceiptTask implements Runnable{
             return;
         }
         log.info("-========++++++++++++++> 线程开始执行:{}", DateUtil.formatDateTime(new Date()));
-        log.info("-========++++++++++++++> 休眠20秒钟,再处理图片!");
+        //log.info("-========++++++++++++++> 休眠20秒钟,再处理图片!");
         try {
             ws.sendToUser(requestModel.getWalletAddress(), "图片处理任务准备开始 code:200; time:"+ DateUtil.formatDateTime(new Date()));
-            Thread.sleep(20*1000);
+            //Thread.sleep(20*1000);
             String walletAddress = requestModel.getWalletAddress();
             String imgUrl = requestModel.getImgUrl();
             String process_id = requestModel.getProcess_id();
@@ -86,10 +86,7 @@ public class AsyncProcessReceiptTask implements Runnable{
 
             //todo 此处消息分发到指定的前端
             ws.sendToUser(requestModel.getWalletAddress(), "图片处理任务已完成 code:200; time:"+ DateUtil.formatDateTime(new Date()));
-        } catch (InterruptedException e) {
-            log.error("AsyncProcessReceiptTask线程中断", e);
-            Thread.currentThread().interrupt(); // 保持中断标记
-        } catch (Exception e) {
+        }  catch (Exception e) {
             log.error("AsyncProcessReceiptTask执行异常", e);
         }
         log.info("-========++++++++++++++> 线程结束执行:{}", DateUtil.formatDateTime(new Date()));

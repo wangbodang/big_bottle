@@ -48,7 +48,8 @@ public class AccessLogInterceptor implements HandlerInterceptor {
 
         //log.info("--------------------------------------->>>>>>>>> 经过日志拦截器:[{}]", this.getClass().getName());
         String ipAddr = IpUtils.getIpAddr(request);
-        String locationAddr = AddressUtils.getRealAddressByIP(ipAddr);
+        //String locationAddr = AddressUtils.getRealAddressByIP(ipAddr);
+        String locationAddr = "";
         String contextPath = request.getContextPath();
         String requestURI = request.getRequestURI();
 

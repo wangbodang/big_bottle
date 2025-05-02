@@ -35,6 +35,7 @@
         <project.groupId>${project.groupId}</project.groupId>
         <bitwalker.version>1.21</bitwalker.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -309,7 +310,6 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
-
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -347,9 +347,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.4.0</version>
-
                 <executions>
-
                     <!-- Execution 1: 添加构建时间 -->
                     <execution>
                         <id>add-timestamp</id>
@@ -358,29 +356,35 @@
                             <goal>timestamp-property</goal>
                         </goals>
                         <configuration>
-                                <!--<timestampPropertyName>build.timestamp</timestampPropertyName>
-                                <timestampFormat>yyyy-MM-dd HH:mm:ss</timestampFormat>-->
                             <name>build.timestamp</name> <!-- ✅ 必须是 name -->
                             <pattern>yyyy-MM-dd HH:mm:ss</pattern> <!-- ✅ 使用 pattern -->
                         </configuration>
                     </execution>
-
-                    <!-- Execution 2: 可选：解析版本（避免与 timestamp 冲突） -->
-                    <!--
-                    <execution>
-                        <id>parse-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                    </execution>
-                    -->
-
                 </executions>
             </plugin>
-
-
-
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault> <!-- 默认激活 -->
+            </activation>
+            <properties>
+                <env>dev</env>
+            </properties>
+        </profile>
+        <profile>
+            <id>uat</id>
+            <properties>
+                <env>uat</env>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <env>prod</env>
+            </properties>
+        </profile>
+    </profiles>
 </project>

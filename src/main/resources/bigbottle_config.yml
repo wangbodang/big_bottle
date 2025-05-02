@@ -13,6 +13,6 @@ bigbottle:
 
   counttimes:
     ##每天上传最大次数
-    max: 10
+    max: 3
     ##获取最后几张小票
     lastnum: 5

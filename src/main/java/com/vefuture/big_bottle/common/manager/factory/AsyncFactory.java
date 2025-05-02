@@ -56,7 +56,8 @@ public class AsyncFactory
             @Override
             public void run()
             {
-                String address = AddressUtils.getRealAddressByIP(ip);
+                //String address = AddressUtils.getRealAddressByIP(ip);
+                String address = "";
                 StringBuilder s = new StringBuilder();
                 s.append(BlockUtils.getBlock(ip));
                 s.append(address);

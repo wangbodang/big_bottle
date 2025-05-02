@@ -101,7 +101,7 @@ public class BVefutureBigBottleController {
             Optional<BVefutureBigBottle> optById = bigBottleService.getOptById(1);
             log.info("---> 查询数据成功:{}", optById);
             // 推送给指定用户
-            ws.sendToUser("U42", "图片处理任务已完成 code:200; time:"+ DateUtil.formatDateTime(new Date()));
+            //ws.sendToUser("U42", "图片处理任务已完成 code:200; time:"+ DateUtil.formatDateTime(new Date()));
             return ApiResponse.success(optById);
         } catch (Exception e) {
             log.error("---> 查询数据异常:{}", e.getMessage());
