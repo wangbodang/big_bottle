@@ -8,12 +8,12 @@ This document outlines the economic model for the $B3TR token within the Bigboot
 The $B3TR$ token share allocated to the team consists of two parts:
 
 1.  **Base Allocation:** 100% of this portion is allocated to the team.
-2.  **Votes Allocation:** The team receives a fixed **30%** share from this allocation pool in each distribution period.
+2.  **Votes Allocation:** The team receives a fixed **40%** share from this allocation pool in each distribution period.
 
 **Mechanism Interpretation:**
 
 * A defined portion of tokens is designated as the "Votes Allocation" pool periodically.
-* From this specific pool, the team consistently receives **30%** of the tokens allocated during that period. The remaining **70%** may be allocated for other purposes as defined by the project's governance or tokenomics (such as user rewards, ecosystem development, etc.).
+* From this specific pool, the team consistently receives **40%** of the tokens allocated during that period. The remaining **60%** may be allocated for other purposes as defined by the project's governance or tokenomics (such as user rewards, ecosystem development, etc.).
 
 ## 2. User Token Distribution
 
