@@ -59,7 +59,7 @@ The amount of $B3TR$ tokens a user can claim each week depends on the proportion
 * Each week, a total $B3TR$ reward pool is allocated for distribution among all participating users.
 * A user's share of the reward is proportional to the points they contributed during that week.
 * **Claim Cap:** Each user can claim a maximum of **50 $B3TR** per week.
-* **Rollover Mechanism:** If the $B3TR$ in the weekly reward pool is not fully distributed (e.g., because users hit their claim caps, or total points earned are low), the remaining undistributed $B3TR$ will automatically roll over and be added to the reward pool for the following week.
+* **Rollover Mechanism:** If the $B3TR in the weekly reward pool is not fully distributed (e.g., because users hit their claim caps, or total points earned are low), the remaining undistributed $B3TR will automatically roll over and be added to the reward pool for the following week.
 
 ---
 
