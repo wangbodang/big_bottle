@@ -20,7 +20,7 @@ comment on column vefuture.b_vef_black_list.id is '主键长整型自增';
 
 comment on column vefuture.b_vef_black_list.wallet_address is '钱包地址';
 
-comment on column vefuture.b_vef_black_list.black_type is '黑名单类型 0-默认值目前无意义 1-本系统自己拦黑 3-外部导入';
+comment on column vefuture.b_vef_black_list.black_type is '黑名单类型 0-默认值目前无意义 1-本系统自己拦黑 3-外部导入 5-存疑';
 
 comment on column vefuture.b_vef_black_list.remark is '备注';
 
