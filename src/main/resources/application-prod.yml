@@ -3,7 +3,7 @@
 spring:
   datasource:
     ##url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
-    url: jdbc:postgresql://54.92.92.209:5432/postgres?currentSchema=vefuture
+    url: jdbc:postgresql://18.176.28.203:5432/postgres?currentSchema=vefuture
     username: postgres
     password: BigBottle_wu
 bigbottle:
