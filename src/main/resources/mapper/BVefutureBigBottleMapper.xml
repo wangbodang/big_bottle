@@ -35,6 +35,13 @@
             <if test="qo.endDate != null and qo.endDate != ''">
                 AND t.create_time &lt;= #{qo.endDate}::timestamp
             </if>
+            <if test="qo.isTimeThreshold != null">
+                AND t.is_time_threshold = #{qo.isTimeThreshold}
+            </if>
+
+            <if test="qo.retinfoIsAvaild != null">
+                AND t.retinfo_is_availd = #{qo.retinfoIsAvaild}
+            </if>
         </where>
         GROUP BY t.wallet_address, t.img_url
         ORDER BY MIN(t.id) DESC
