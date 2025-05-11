@@ -3,9 +3,10 @@ package com.vefuture.big_bottle.web.vefuture.service;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
+import com.vefuture.big_bottle.web.vefuture.entity.qo.BigBottleQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CountLimitVo;
+import com.vefuture.big_bottle.web.vefuture.entity.vo.InBlackListDto;
 
 /**
  * <p>
@@ -24,7 +25,7 @@ public interface BVefutureBigBottleService extends IService<BVefutureBigBottle> 
      * @return  返回值说明
      */
 
-    ApiResponse processReceipt(ReqBigBottleQo vo);
+    ApiResponse processReceipt(BigBottleQueryDTO vo);
 
     /**
      *
@@ -41,7 +42,7 @@ public interface BVefutureBigBottleService extends IService<BVefutureBigBottle> 
      * @param  qo 包含钱包地址
      * @return  返回值说明
      */
-    ApiResponse<CardInfoVo> getCardInfoByWalletAddress(ReqBigBottleQo qo);
+    ApiResponse<CardInfoVo> getCardInfoByWalletAddress(BigBottleQueryDTO qo);
 
     /**
      *
@@ -50,12 +51,14 @@ public interface BVefutureBigBottleService extends IService<BVefutureBigBottle> 
      * @return  返回值说明
      */
 
-    ApiResponse<CardInfoVo> getWeekPointsByWalletAddress(ReqBigBottleQo qo);
+    ApiResponse<CardInfoVo> getWeekPointsByWalletAddress(BigBottleQueryDTO qo);
 
     /**
      * 根据用户的钱包确定当天上传的次数是否到达最大的限制
      * @param qo
      * @return
      */
-    ApiResponse<CountLimitVo> getCountLimit(ReqBigBottleQo qo);
+    ApiResponse<CountLimitVo> getCountLimit(BigBottleQueryDTO qo);
+
+    ApiResponse<InBlackListDto> wallletInBlackList(BigBottleQueryDTO vo);
 }

@@ -17,8 +17,11 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ManageBigBottleVo {
-
+    private String ids;
     private String processId;
+
+    private Integer blackType; //拉黑状态
+
     private String walletAddress;
     private String imgUrl;
     private String imgName;

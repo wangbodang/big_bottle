@@ -1,25 +1,24 @@
 package com.vefuture.big_bottle.web.vefuture.controller;
 
 
-import cn.hutool.core.date.DateUtil;
+import com.vefuture.big_bottle.common.annotation.BlacklistCheck;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
-import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
+import com.vefuture.big_bottle.web.vefuture.entity.qo.BigBottleQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CountLimitVo;
+import com.vefuture.big_bottle.web.vefuture.entity.vo.InBlackListDto;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
 import com.vefuture.big_bottle.web.websocket.WsSessionManager;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -51,7 +50,7 @@ public class BVefutureBigBottleController {
      * @return
      */
     @RequestMapping(value = "/cardinfo", method = RequestMethod.POST)
-    public ApiResponse<CardInfoVo> getCardInfo(@RequestBody ReqBigBottleQo qo){
+    public ApiResponse<CardInfoVo> getCardInfo(@RequestBody BigBottleQueryDTO qo){
         log.info("---> 请求card_info时的钱包地址为:[{}]", qo.getWalletAddress());
         ApiResponse<CardInfoVo> cardInfo = bigBottleService.getCardInfoByWalletAddress(qo);
         return cardInfo;
@@ -64,7 +63,7 @@ public class BVefutureBigBottleController {
      * @return
      */
     @RequestMapping(value = "/weekpoints", method = RequestMethod.POST)
-    public ApiResponse<CardInfoVo> getWeekPoints(@RequestBody ReqBigBottleQo qo){
+    public ApiResponse<CardInfoVo> getWeekPoints(@RequestBody BigBottleQueryDTO qo){
         log.info("---> 请求card_info时的钱包地址为:[{}]", qo.getWalletAddress());
         ApiResponse<CardInfoVo> cardInfo = bigBottleService.getWeekPointsByWalletAddress(qo);
         return cardInfo;
@@ -76,9 +75,24 @@ public class BVefutureBigBottleController {
      * @return  返回值说明
      */
     @RequestMapping(value = "/process", method = RequestMethod.POST)
-    public ApiResponse processReceipt(@RequestBody ReqBigBottleQo vo){
+    @BlacklistCheck(params = {"wallet_address", "walletAddress"})
+    public ApiResponse processReceipt(@RequestBody BigBottleQueryDTO vo){
         log.info("---> 传过来的数据为:{}", vo);
         ApiResponse apiResponse = apiResponse = bigBottleService.processReceipt(vo);
+        return apiResponse;
+    }
+
+    /**
+     * 前端发送
+     *
+     * @param  vo 前端VO
+     * @return  返回值说明
+     */
+    @RequestMapping(value = "/inblacklist", method = RequestMethod.POST)
+    //@BlacklistCheck(params = {"wallet_address", "walletAddress"})
+    public ApiResponse<InBlackListDto> walletAddressInBalckList(@RequestBody BigBottleQueryDTO vo){
+        log.info("---> 传过来的数据为:{}", vo);
+        ApiResponse<InBlackListDto> apiResponse = apiResponse = bigBottleService.wallletInBlackList(vo);
         return apiResponse;
     }
 
@@ -89,7 +103,7 @@ public class BVefutureBigBottleController {
      * @return  返回值说明
      */
     @RequestMapping(value = "/countlimit", method = RequestMethod.POST)
-    public ApiResponse<CountLimitVo> getCountLimit(@RequestBody ReqBigBottleQo qo){
+    public ApiResponse<CountLimitVo> getCountLimit(@RequestBody BigBottleQueryDTO qo){
         ApiResponse<CountLimitVo> responseVo = bigBottleService.getCountLimit(qo);
         return responseVo;
     }

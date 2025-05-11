@@ -10,11 +10,13 @@ import com.vefuture.big_bottle.common.exception.BadRequestException;
 import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.common.util.UUIDCreator;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
-import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
+import com.vefuture.big_bottle.web.vefuture.entity.qo.BigBottleQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CountLimitVo;
+import com.vefuture.big_bottle.web.vefuture.entity.vo.InBlackListDto;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
 import com.vefuture.big_bottle.web.vefuture.service.BVefutureBigBottleService;
+import com.vefuture.big_bottle.web.vefuture.service.IBlackListService;
 import com.vefuture.big_bottle.web.websocket.WsSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -46,6 +50,8 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     private final WsSessionManager ws;
     @Autowired
     private ExecutorService threadPoolExecutor;
+    @Autowired
+    private IBlackListService blackListService;
     @Value("${bigbottle.counttimes.max:10}")
     private Integer countMax;
     @Value("${bigbottle.counttimes.lastnum:10}")
@@ -74,7 +80,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
      * @return  返回值说明
      */
     @Override
-    public ApiResponse<CardInfoVo> getCardInfoByWalletAddress(ReqBigBottleQo qo) {
+    public ApiResponse<CardInfoVo> getCardInfoByWalletAddress(BigBottleQueryDTO qo) {
         //钱包地址
         String walletAddress = qo.getWalletAddress();
         if (StrUtil.isBlank(walletAddress)) {
@@ -113,7 +119,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
      * @return
      */
     @Override
-    public ApiResponse<CardInfoVo> getWeekPointsByWalletAddress(ReqBigBottleQo qo) {
+    public ApiResponse<CardInfoVo> getWeekPointsByWalletAddress(BigBottleQueryDTO qo) {
 
         CardInfoVo cardInfoVo = new CardInfoVo();
         //钱包地址和图片地址
@@ -145,7 +151,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
      * @return
      */
     @Override
-    public ApiResponse<CountLimitVo> getCountLimit(ReqBigBottleQo qo) {
+    public ApiResponse<CountLimitVo> getCountLimit(BigBottleQueryDTO qo) {
         CountLimitVo countLimitVo = new CountLimitVo();
         //每天最大次数信息
         countLimitVo.setCountMax(countMax);
@@ -166,15 +172,15 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
 
     /**
      * 此处生成UUID, 作为porcess_id用作全流程跟踪
-     * @param  reqBigBottleQo
+     * @param  bigBottleQueryDTO
      * @return  返回值说明
      */
     @Override
-    public ApiResponse processReceipt(ReqBigBottleQo reqBigBottleQo) {
+    public ApiResponse processReceipt(BigBottleQueryDTO bigBottleQueryDTO) {
         //此ID用作全流程跟踪ID
         String process_id = UUIDCreator.getUuidV7().toString();
-        String imgUrl = reqBigBottleQo.getImgUrl();
-        String walletAddress = reqBigBottleQo.getWalletAddress();
+        String imgUrl = bigBottleQueryDTO.getImgUrl();
+        String walletAddress = bigBottleQueryDTO.getWalletAddress();
 
         if(StrUtil.isBlank(walletAddress) || StrUtil.isBlank(imgUrl)){
             log.info("---> 缺失参数 walletAddress imgUrl都不能为空");
@@ -206,5 +212,14 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         return ApiResponse.success();
     }
 
-
+    @Override
+    public ApiResponse<InBlackListDto> wallletInBlackList(BigBottleQueryDTO vo) {
+        if(StrUtil.isBlank(vo.getWalletAddress())){
+            return ApiResponse.error(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(), ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getMessage());
+        }
+        boolean inBlackList = blackListService.isBlacklisted(vo.getWalletAddress().trim().toLowerCase());
+        InBlackListDto inBlackListDto = new InBlackListDto();
+        inBlackListDto.setInBlackList(inBlackList);
+        return ApiResponse.success(inBlackListDto);
+    }
 }

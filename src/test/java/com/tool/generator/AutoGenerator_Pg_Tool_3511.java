@@ -199,7 +199,7 @@ public class AutoGenerator_Pg_Tool_3511 {
                 "sys_user_roles",
                 "sys_resources",
                 "sys_role_resources"*/
-                "b_vef_process_log"
+                "b_vef_black_list"
         };
         // Use List.of for immutable list or new ArrayList<>(Arrays.asList(...)) for mutable
         return new ArrayList<>(Arrays.asList(nameArr));

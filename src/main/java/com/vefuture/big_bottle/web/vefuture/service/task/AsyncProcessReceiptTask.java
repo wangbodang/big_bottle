@@ -71,7 +71,7 @@ public class AsyncProcessReceiptTask implements Runnable{
                 //return ApiResponse.error(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
                 //throw new BusinessException(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
                 //存一个空信息到库里
-                saveNullReceiptToDb(walletAddress, imgUrl, currentTime);
+                saveNullReceiptToDb(requestModel, currentTime);
                 return;
             }
 
@@ -82,21 +82,23 @@ public class AsyncProcessReceiptTask implements Runnable{
             } catch (ImageProcessingException | IOException e) {
                 log.error("===> 判定图片Exif信息异常:{}", e.getMessage());
             }
-            saveToDb(process_id, walletAddress, imgUrl, retinfoBigBottle, currentTime, detectionResult);
+            saveToDb(requestModel, retinfoBigBottle, currentTime, detectionResult);
 
             //todo 此处消息分发到指定的前端
-            ws.sendToUser(requestModel.getWalletAddress(), "图片处理任务已完成 code:200; time:"+ DateUtil.formatDateTime(new Date()));
+            //ws.sendToUser(requestModel.getWalletAddress(), "图片处理任务已完成 code:200; time:"+ DateUtil.formatDateTime(new Date()));
         }  catch (Exception e) {
             log.error("AsyncProcessReceiptTask执行异常", e);
         }
         log.info("-========++++++++++++++> 线程结束执行:{}", DateUtil.formatDateTime(new Date()));
     }
 
+    //空的时候也要一个流程ID
     //存储一个空的数据
-    private void saveNullReceiptToDb(String walletAddress, String imgUrl, LocalDateTime currentTime) {
+    private void saveNullReceiptToDb(RequestModel requestModel, LocalDateTime currentTime) {
         BVefutureBigBottle bigBottle = new BVefutureBigBottle();
-        bigBottle.setWalletAddress(walletAddress);
-        bigBottle.setImgUrl(imgUrl);
+        bigBottle.setProcessId(requestModel.getProcess_id());
+        bigBottle.setWalletAddress(requestModel.getWalletAddress());
+        bigBottle.setImgUrl(requestModel.getImgUrl());
         bigBottle.setRetinfoIsAvaild(false);
         bigBottle.setIsDelete("1");
         bigBottle.setCreateTime(BbDateTimeUtils.localDateTimeToDate(currentTime));
@@ -104,14 +106,18 @@ public class AsyncProcessReceiptTask implements Runnable{
     }
 
     //存储到数据库
-    private void saveToDb(String process_id, String walletAddress, String imgUrl, RetinfoBigBottle retinfoBigBottle, LocalDateTime currentTime, ImageSourceDetector.DetectionResult detectionResult) {
+    private void saveToDb(RequestModel requestModel, RetinfoBigBottle retinfoBigBottle, LocalDateTime currentTime, ImageSourceDetector.DetectionResult detectionResult) {
 
         ArrayList<RetinfoDrink> drinkList = retinfoBigBottle.getDrinkList();
         drinkList.forEach(drink -> {
+
             BVefutureBigBottle bigBottle = new BVefutureBigBottle();
+            String walletAddressLowcase = requestModel.getWalletAddress().toLowerCase();
+            String processId = requestModel.getProcess_id();
+            String imgUrl = requestModel.getImgUrl();
             //公共信息
-            bigBottle.setProcessId(process_id);
-            bigBottle.setWalletAddress(walletAddress.toLowerCase());
+            bigBottle.setProcessId(processId);
+            bigBottle.setWalletAddress(walletAddressLowcase);
             bigBottle.setImgUrl(imgUrl);
             bigBottle.setRetinfoIsAvaild(retinfoBigBottle.getRetinfoIsAvaild());
             bigBottle.setRetinfoReceiptTime(retinfoBigBottle.getRetinfoReceiptTime());
@@ -127,7 +133,7 @@ public class AsyncProcessReceiptTask implements Runnable{
             bigBottle.setDePlastic(deplastStrategyContext.caculDeplast(bigBottle));
 
             //根据该数据是否在数据库有记录判断是否为有效数据 isDelete = 1 为无效数据
-            setDeletFlag(retinfoBigBottle.getRetinfoReceiptTime(), currentTime, drink, bigBottle, walletAddress);
+            setDeletFlag(retinfoBigBottle.getRetinfoReceiptTime(), currentTime, drink, bigBottle, walletAddressLowcase);
             //一张小票用统一一个插入时间便于后期统计
             bigBottle.setCreateTime(BbDateTimeUtils.localDateTimeToDate(currentTime));
             bigBottleMapper.insert(bigBottle);

@@ -6,3 +6,9 @@ spring:
     url: jdbc:postgresql://54.92.92.209:5432/postgres?currentSchema=vefuture
     username: postgres
     password: BigBottle_wu
+bigbottle:
+  counttimes:
+    ##每天上传最大次数
+    max: 1
+    ##获取最后几张小票
+    lastnum: 5

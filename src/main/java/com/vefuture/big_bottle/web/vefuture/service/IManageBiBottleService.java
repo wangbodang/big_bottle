@@ -1,7 +1,10 @@
 package com.vefuture.big_bottle.web.vefuture.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.vefuture.big_bottle.web.vefuture.entity.qo.ReqBigBottleQo;
+import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
+import com.vefuture.big_bottle.web.vefuture.entity.BlackList;
+import com.vefuture.big_bottle.web.vefuture.entity.qo.BlackListQueryDTO;
+import com.vefuture.big_bottle.web.vefuture.entity.qo.BigBottleQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.ManageBigBottleVo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,5 +16,14 @@ import java.util.List;
  * @description TODO: 类描述
  */
 public interface IManageBiBottleService {
-    Page<ManageBigBottleVo> getBigBottleList(HttpServletRequest request, Page<ManageBigBottleVo> page, ReqBigBottleQo qo);
+    Page<ManageBigBottleVo> getBigBottleList(HttpServletRequest request, Page<ManageBigBottleVo> page, BigBottleQueryDTO qo);
+
+    Page<BlackList> getBlackList(HttpServletRequest request, Page<BlackList> page, BlackListQueryDTO dto);
+
+    List<BVefutureBigBottle> getDetailsByIds(List<String> ids);
+
+
+    void invalidateReceiptsByIds(List<Object> ids);
+
+    void addWalletAddressToBlacklist(String walletAddress, Integer type);
 }
