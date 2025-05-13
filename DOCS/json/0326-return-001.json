@@ -1,8 +1,0 @@
-{
-  "code": 0,
-  "cost": "0",
-  "data": "{\"drinkList\":[{\"retinfoDrinkAmout\":1,\"retinfoDrinkCapacity\":2000,\"retinfoDrinkName\":\"サントリーウーロンチャ\"}],\"retinfoIsAvaild\":true,\"retinfoReceiptTime\":\"2025-01-21 17:03:00\",\"timeThreshold\":false}",
-  "debug_url": "https://www.coze.com/work_flow?execute_id=7485941147157250066&space_id=7431862069139587080&workflow_id=7482017874254037010&execute_mode=2",
-  "msg": "Success",
-  "token": 3542
-}
