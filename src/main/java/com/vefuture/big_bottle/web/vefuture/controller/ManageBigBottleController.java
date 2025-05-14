@@ -68,17 +68,14 @@ public class ManageBigBottleController {
         List<BVefutureBigBottle> receipts = manageBiBottleService.getDetailsByIds(ids);
         return ApiResponse.success(receipts);
     }
-
+    //作废小票
     @PostMapping("/receipt/invalidate")
     public ApiResponse<String> invalidateReceipts(@RequestBody Map<String, List<Object>> body) {
         List<Object> rawIds = body.get("ids");
-
         if (rawIds == null || rawIds.isEmpty()) {
             return ApiResponse.error(ResultCode.RECEIPT_ERR_PARAMETER_NOT_COMPLETE.getCode(), "参数 ids 不能为空");
         }
-
         log.info("---> 传入的参数为:{}", rawIds);
-
         try {
             manageBiBottleService.invalidateReceiptsByIds(rawIds);
             return ApiResponse.success("小票已成功作废");
@@ -100,6 +97,18 @@ public class ManageBigBottleController {
         manageBiBottleService.addWalletAddressToBlacklist(walletAddress, blackType);
 
         return ApiResponse.success("地址已加入黑名单");
+    }
+
+    //导出
+    @PostMapping("/bigbottlelist/export")
+    public void export(HttpServletRequest request, HttpServletResponse response, @RequestBody BigBottleQueryDTO dto){
+        log.info("===> 导出的请求参数为:{}", dto);
+        try {
+            manageBiBottleService.exportCsv(request, response, dto);
+        } catch (Exception e) {
+            log.error("CSV导出失败：{}", e.getMessage(), e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
     }
     /*@PostMapping("/blacklist")
     public ApiResponse<String> debug(@RequestBody Map<String, Object> map) {

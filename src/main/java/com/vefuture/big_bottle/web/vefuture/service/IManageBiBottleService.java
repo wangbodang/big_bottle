@@ -8,6 +8,8 @@ import com.vefuture.big_bottle.web.vefuture.entity.qo.BigBottleQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.ManageBigBottleVo;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -26,4 +28,7 @@ public interface IManageBiBottleService {
     void invalidateReceiptsByIds(List<Object> ids);
 
     void addWalletAddressToBlacklist(String walletAddress, Integer type);
+
+
+    void exportCsv(HttpServletRequest request, HttpServletResponse response, BigBottleQueryDTO dto);
 }

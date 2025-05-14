@@ -1,6 +1,7 @@
 package com.vefuture.big_bottle.web.vefuture.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.BlackList;
 import com.vefuture.big_bottle.web.vefuture.entity.qo.BigBottleQueryDTO;
@@ -21,8 +23,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,6 +134,55 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
             blackList.setBlackType(type);
             blackListMapper.updateById(blackList);
         }
+    }
 
+    //导出CSV
+    @Override
+    public void exportCsv(HttpServletRequest request, HttpServletResponse response, BigBottleQueryDTO dto) {
+        String nowStr = DateUtil.formatDateTime(new Date()).replaceAll(" ", "_").replaceAll(":", "_");
+
+        String fileName = "B3ty_Token_" + nowStr + ".csv";
+        File csvFile = new File(fileName);
+        try {
+            // 设置响应头
+            response.setContentType("text/csv");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
+
+            // 获取输出流
+            ServletOutputStream outputStream = response.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+            BufferedWriter writer = new BufferedWriter(osw);
+
+            // 写入 BOM 头（防止 Excel 中文乱码）
+            writer.write('\ufeff');
+
+            // 写入 CSV 表头
+            writer.write("ID,钱包地址,图片链接,饮料种类,饮料数量,黑名单类型");
+            writer.newLine();
+
+            // 查询数据（你应该根据 dto 查询出数据）
+            Page<ManageBigBottleVo> page = new Page<>(dto.getCurrent(), dto.getSize());
+            Page<ManageBigBottleVo> bigBottleList = getBigBottleList(request, page, dto);// 替换为你实际的方法
+
+            // 写入数据行
+            for (ManageBigBottleVo item : bigBottleList.getRecords()) {
+                writer.write(String.format("%s,%s,%s,%d,%d,%d",
+                        item.getIds(),
+                        item.getWalletAddress(),
+                        item.getImgUrl(),
+                        item.getDrinkKind(),
+                        item.getDrinkAmount(),
+                        item.getBlackType()
+                ));
+                writer.newLine();
+            }
+
+            writer.flush();
+            writer.close();
+
+        } catch (IOException e) {
+            throw new BusinessException("导出失败!");
+        }
     }
 }
