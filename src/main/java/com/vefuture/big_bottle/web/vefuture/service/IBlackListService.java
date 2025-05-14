@@ -2,6 +2,7 @@ package com.vefuture.big_bottle.web.vefuture.service;
 
 import com.vefuture.big_bottle.web.vefuture.entity.BlackList;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.vefuture.big_bottle.web.vefuture.entity.qo.BlackListQueryDTO;
 
 /**
  * <p>
@@ -13,4 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IBlackListService extends IService<BlackList> {
     boolean isBlacklisted(String walletAddress);
+
+    void recoverBlack(BlackListQueryDTO dto);
 }

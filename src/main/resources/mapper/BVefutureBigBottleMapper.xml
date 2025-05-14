@@ -21,9 +21,15 @@
             SUM(t.retinfo_drink_capacity)     AS drink_capacity,
             SUM(t.retinfo_drink_amout)        AS drink_amount,
             MAX(t.retinfo_receipt_time)       AS retinfo_receipt_time,
-            MAX(t.create_time)                AS create_time
+            MAX(t.create_time)                AS create_time,
+            count(1)                          AS drink_kind,
+            sum(t.drink_point)                AS receipt_point,
+            BOOL_OR(t.is_delete = '1')        AS is_delete
         FROM b_vefuture_big_bottle t
         <where>
+            <if test="qo.isDelete != null and qo.isDelete != ''">
+                AND t.is_delete = #{qo.isDelete}
+            </if>
             <!-- 根据 qo 动态加你的查询条件 -->
             <if test="qo.walletAddress != null and qo.walletAddress != ''">
                 AND t.wallet_address like '%'|| #{qo.walletAddress} || '%'
@@ -33,8 +39,9 @@
                 AND t.create_time &gt;= #{qo.startDate}::timestamp
             </if>
             <if test="qo.endDate != null and qo.endDate != ''">
-                AND t.create_time &lt;= #{qo.endDate}::timestamp
+                AND t.create_time &lt; #{qo.endDate}::timestamp
             </if>
+
             <if test="qo.isTimeThreshold != null">
                 AND t.is_time_threshold = #{qo.isTimeThreshold}
             </if>

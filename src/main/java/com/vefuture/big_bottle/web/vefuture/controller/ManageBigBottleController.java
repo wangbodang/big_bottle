@@ -86,6 +86,8 @@ public class ManageBigBottleController {
             return ApiResponse.error(ResultCode.INVALIDATE_RECEIPT_FAILE.getCode(), ResultCode.INVALIDATE_RECEIPT_FAILE.getMessage()+e.getMessage());
         }
     }
+
+    //拉黑地址
     @PostMapping("/wallet/blacklist")
     public ApiResponse<String> addWalletToBlacklist(@RequestBody BlackListQueryDTO dto) {
         String walletAddress = dto.getWalletAddress();

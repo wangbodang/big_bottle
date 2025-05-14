@@ -24,4 +24,5 @@ public class BigBottleQueryDTO {
     //is_time_threshold retinfo_is_availd
     private Boolean isTimeThreshold;
     private Boolean retinfoIsAvaild;
+    private String isDelete;
 }

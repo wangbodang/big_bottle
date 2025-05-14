@@ -55,3 +55,8 @@ Thumbs.db
 DOCS/
 /DOCS/
 *.yml
+/src/test/java/com/tool/cal/CalToken.java
+/src/test/java/com/tool/cal/BasetMethod.java
+/src/main/java/com/vefuture/big_bottle/web/vefuture/CalTokenController.java
+/src/main/java/com/vefuture/big_bottle/web/vefuture/cal/CalTokenController.java
+/src/main/java/com/vefuture/big_bottle/web/vefuture/cal/CalTokenService.java

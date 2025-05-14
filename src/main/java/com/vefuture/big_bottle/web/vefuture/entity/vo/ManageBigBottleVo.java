@@ -36,8 +36,16 @@ public class ManageBigBottleVo {
     private Integer drinkCapacity;
     private Integer drinkAmount;
 
+    private Boolean isDelete;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") //接收前端传过来的数据时
     //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo") //返回到前端时默认格式
     private Date createTime;
+
+    private Integer drinkKind;  //饮料数量
+    private Integer receiptPoint; //小票积分
+
+    private Integer preB3trToken;
+    private Integer finalB3trToken;
 }

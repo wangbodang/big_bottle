@@ -57,10 +57,17 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
     @Override
     public Page<BlackList> getBlackList(HttpServletRequest request, Page<BlackList> page, BlackListQueryDTO dto) {
         String walletAddress = StrUtil.isBlank(dto.getWalletAddress()) ? "" : dto.getWalletAddress().toLowerCase().trim();
-
-        LambdaQueryWrapper<BlackList> queryWrapper = Wrappers.<BlackList>lambdaQuery().like(
-                BlackList::getWalletAddress, walletAddress
-        );
+        List<Integer> blackTypes = dto.getBlackTypes();
+        log.info("===> 查询条件为:{}-{}", walletAddress, blackTypes);
+        LambdaQueryWrapper<BlackList> queryWrapper = Wrappers.<BlackList>lambdaQuery()
+                // 当 walletAddress 非空时才加 like
+                .like(StrUtil.isNotBlank(walletAddress), BlackList::getWalletAddress, walletAddress)
+                // 当 blackTypes 列表不为 null 且不空时，才加 in 条件
+                .in(blackTypes != null && !blackTypes.isEmpty(),
+                        BlackList::getBlackType,
+                        blackTypes)
+                // 固定按 createTime 降序
+                .orderByDesc(BlackList::getCreateTime);
         Page<BlackList> blackLists = blackListService.page(page, queryWrapper);
         return blackLists;
     }
