@@ -148,6 +148,7 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
     }
 
     //查询出当前用户当天上传的小票张数 为了限制当天次数
+    //todo 当天有一张正常的，则为正常， 3张失败的为1张正常
     public Integer getCurrDayCountByWalletAddress(String walletAddress) {
         //当前本地时间
         LocalDateTime now = LocalDateTime.now();
@@ -160,6 +161,7 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
         if(CollectionUtil.isEmpty(bigBottles)) {
             return 0;
         }
+        /*
         int count = bigBottles.stream()
                 .collect(Collectors.toMap(
                         BVefutureBigBottle::getImgUrl,   // 去重 key（比如 name）
@@ -167,7 +169,32 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
                         (existing, replacement) -> existing // 保留重复时的哪个（保留第一个）
                 ))
                 .size();  // 最后 map 的 size 就是去重后的 count
-        return count;
+                */
+        List<BVefutureBigBottle> distinct = bigBottles.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toCollection(() -> new TreeSet<>(
+                                Comparator.comparing(e -> e.getWalletAddress() + "_" + e.getImgUrl())
+                        )),
+                        ArrayList::new
+                ));
+        distinct.forEach(e -> {
+            log.info("====>>>> BigBottle:{}-{}-{}-{}-{}-{}-{}", e.getId(), e.getProcessId(), e.getWalletAddress(), e.getImgUrl(), e.getRetinfoIsAvaild(), e.getIsTimeThreshold(), e.getIsDelete());
+        });
+        //统计数量
+        long trueCount = distinct.stream()
+                .filter(e -> "0".equalsIgnoreCase(e.getIsDelete()))
+                .count();
+        if(trueCount > 0){
+            return Integer.valueOf((int) trueCount);
+        }
+        long falseCount = distinct.stream()
+                .filter(e -> "1".equalsIgnoreCase(e.getIsDelete()))
+                .count();
+        if(falseCount >= 3){
+            return 1;
+        }else {
+            return 0;
+        }
     }
 
     /*
