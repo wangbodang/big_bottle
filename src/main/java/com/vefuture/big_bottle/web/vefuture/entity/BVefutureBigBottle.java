@@ -81,6 +81,9 @@ public class BVefutureBigBottle implements Serializable {
     @TableField("retinfo_drink_amout")
     private Integer retinfoDrinkAmout;
 
+    /**
+     * 饮料积分
+     */
     @TableField("drink_point")
     private Integer drinkPoint;
     /**

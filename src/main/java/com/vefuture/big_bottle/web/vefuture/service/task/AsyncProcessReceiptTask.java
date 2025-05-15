@@ -14,6 +14,7 @@ import com.vefuture.big_bottle.web.vefuture.strategy.llm.LlmStrategy;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RequestModel;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RetinfoBigBottle;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RetinfoDrink;
+import com.vefuture.big_bottle.web.vefuture.strategy.points.PointStrategyContext;
 import com.vefuture.big_bottle.web.websocket.WsSessionManager;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,13 +37,20 @@ public class AsyncProcessReceiptTask implements Runnable{
     private BVefutureBigBottleMapper bigBottleMapper;
     private LlmStrategy llmStrategy;
     private DeplastStrategyContext deplastStrategyContext;
+    private PointStrategyContext pointStrategyContext;
 
-    public AsyncProcessReceiptTask(RequestModel requestModel, WsSessionManager manager, BVefutureBigBottleMapper bigBottleMapper, LlmStrategy llmStrategy, DeplastStrategyContext deplastStrategyContext){
+    public AsyncProcessReceiptTask(RequestModel requestModel,
+                                   WsSessionManager manager,
+                                   BVefutureBigBottleMapper bigBottleMapper,
+                                   LlmStrategy llmStrategy,
+                                   DeplastStrategyContext deplastStrategyContext,
+                                   PointStrategyContext pointStrategyContext){
         this.requestModel = requestModel;
         this.ws = manager;
         this.bigBottleMapper = bigBottleMapper;
         this.llmStrategy = llmStrategy;
         this.deplastStrategyContext = deplastStrategyContext;
+        this.pointStrategyContext = pointStrategyContext;
     }
 
     @Override
@@ -129,6 +137,8 @@ public class AsyncProcessReceiptTask implements Runnable{
             bigBottle.setRetinfoDrinkName(drink.getRetinfoDrinkName());
             bigBottle.setRetinfoDrinkCapacity(drink.getRetinfoDrinkCapacity());
             bigBottle.setRetinfoDrinkAmout(drink.getRetinfoDrinkAmout());
+            //积分
+            bigBottle.setDrinkPoint(pointStrategyContext.calculatePoints(bigBottle));
             //减塑量
             bigBottle.setDePlastic(deplastStrategyContext.caculDeplast(bigBottle));
 

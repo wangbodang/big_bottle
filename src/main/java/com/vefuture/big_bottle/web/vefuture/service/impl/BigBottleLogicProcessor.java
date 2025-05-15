@@ -8,9 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.drew.imaging.ImageProcessingException;
 import com.vefuture.big_bottle.common.util.BbDateTimeUtils;
-import com.vefuture.big_bottle.common.util.ImageSourceDetector;
 import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import com.vefuture.big_bottle.common.util.task.TaskManager;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
@@ -23,8 +21,6 @@ import com.vefuture.big_bottle.web.vefuture.strategy.deplast.DeplastStrategyCont
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.LlmContext;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.LlmStrategy;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RequestModel;
-import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RetinfoBigBottle;
-import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RetinfoDrink;
 import com.vefuture.big_bottle.web.vefuture.strategy.points.PointStrategyContext;
 import com.vefuture.big_bottle.web.websocket.WsSessionManager;
 import lombok.RequiredArgsConstructor;
@@ -178,9 +174,10 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
       此处添加上porcess_id用作全流程跟踪
       todo 用异步处理图片上传
     */
-    public void sendReqAndSave(String process_id, String walletAddress, String imgUrl, String llm) throws IOException {
+    public void sendReqAndSave(String ipAddress, String process_id, String walletAddress, String imgUrl, String llm) throws IOException {
 
         RequestModel requestModel = new RequestModel();
+        requestModel.setIpAddress(ipAddress);
         requestModel.setLlm(llm);
         requestModel.setProcess_id(process_id);
         requestModel.setWalletAddress(walletAddress);
@@ -196,7 +193,7 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
             log.error("===> 拿不到Mapper！！！！");
             throw new IllegalStateException("Mapper注入失败！");
         }
-        AsyncProcessReceiptTask asycTask = new AsyncProcessReceiptTask(requestModel, ws, mapper, llmStrategy, deplastStrategyContext);
+        AsyncProcessReceiptTask asycTask = new AsyncProcessReceiptTask(requestModel, ws, mapper, llmStrategy, deplastStrategyContext, pointStrategyContext);
         taskManager.submitTask(process_id, asycTask);
 
         //RetinfoBigBottle retinfoBigBottle = llmStrategy.call(requestModel);

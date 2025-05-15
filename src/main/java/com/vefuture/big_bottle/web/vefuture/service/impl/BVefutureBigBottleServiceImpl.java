@@ -9,6 +9,7 @@ import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BadRequestException;
 import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.common.util.UUIDCreator;
+import com.vefuture.big_bottle.common.util.ip.IpUtils;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.qo.BigBottleQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -176,9 +178,10 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
      * @return  返回值说明
      */
     @Override
-    public ApiResponse processReceipt(BigBottleQueryDTO bigBottleQueryDTO) {
+    public ApiResponse processReceipt(HttpServletRequest request, BigBottleQueryDTO bigBottleQueryDTO) {
         //此ID用作全流程跟踪ID
         String process_id = UUIDCreator.getUuidV7().toString();
+        String ipAddr = IpUtils.getIpAddr(request);
         String imgUrl = bigBottleQueryDTO.getImgUrl();
         String walletAddress = bigBottleQueryDTO.getWalletAddress();
 
@@ -189,6 +192,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         }
         walletAddress = walletAddress.toLowerCase();
 
+        //todo 判断当天次数
         //获取当天上传的次数
         Integer currDayCountByWalletAddress = bottleLogicProcessor.getCurrDayCountByWalletAddress(walletAddress);
 
@@ -200,7 +204,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
         try {
             //coze dify
             String llm = "dify";
-            bottleLogicProcessor.sendReqAndSave(process_id, walletAddress, imgUrl, llm);
+            bottleLogicProcessor.sendReqAndSave(ipAddr, process_id, walletAddress, imgUrl, llm);
         } catch (BusinessException businessException){
             log.error("===> 业务异常:{}", businessException.getMessage());
             return ApiResponse.error(businessException.getCode(), businessException.getMessage());

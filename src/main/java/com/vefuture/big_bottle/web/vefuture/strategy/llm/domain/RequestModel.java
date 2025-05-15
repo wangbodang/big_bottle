@@ -21,4 +21,7 @@ public class RequestModel {
     private String process_id;
     //
     private String llm;
+
+    //
+    private String ipAddress;
 }

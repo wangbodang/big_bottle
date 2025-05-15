@@ -45,9 +45,10 @@ public class DifyStrategy implements LlmStrategy {
         String walletAddress = requestModel.getWalletAddress();
         String imgUrl = requestModel.getImgUrl();
         String llm = requestModel.getLlm();
+        String ipAddress = requestModel.getIpAddress();
         try {
             //创建Log
-            Long processLogId = processLogService.createLog(processId, walletAddress, imgUrl);
+            Long processLogId = processLogService.createLog(ipAddress, processId, walletAddress, imgUrl);
             //1 构造请求参数
             RequestModelDTO.ImgUrl imgUrlDTO = new RequestModelDTO.ImgUrl();
             imgUrlDTO.setUrl(imgUrl);

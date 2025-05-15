@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  */
 public interface IProcessLogService extends IService<ProcessLog> {
 
-    Long createLog(String processId, String walletAddress, String imgUrl);
+    Long createLog(String ipAddress, String processId, String walletAddress, String imgUrl);
 
     void updateAiStartTime(Long processLogId, LocalDateTime now);
 

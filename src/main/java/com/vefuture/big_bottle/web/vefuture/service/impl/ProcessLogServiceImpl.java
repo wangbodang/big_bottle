@@ -21,8 +21,9 @@ import java.time.LocalDateTime;
 @Service
 public class ProcessLogServiceImpl extends ServiceImpl<ProcessLogMapper, ProcessLog> implements IProcessLogService {
     @Override
-    public Long createLog(String processId, String walletAddress, String imgUrl) {
+    public Long createLog(String ipAddress, String processId, String walletAddress, String imgUrl) {
         ProcessLog processLog = new ProcessLog();
+        processLog.setIpAddress(ipAddress);
         processLog.setProcessId(processId);
         processLog.setWalletAddress(walletAddress);
         processLog.setImgUrl(imgUrl);

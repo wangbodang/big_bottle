@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 /**
@@ -76,9 +77,9 @@ public class BVefutureBigBottleController {
      */
     @RequestMapping(value = "/process", method = RequestMethod.POST)
     @BlacklistCheck(params = {"wallet_address", "walletAddress"})
-    public ApiResponse processReceipt(@RequestBody BigBottleQueryDTO vo){
+    public ApiResponse processReceipt(HttpServletRequest request, @RequestBody BigBottleQueryDTO vo){
         log.info("---> 传过来的数据为:{}", vo);
-        ApiResponse apiResponse = apiResponse = bigBottleService.processReceipt(vo);
+        ApiResponse apiResponse = apiResponse = bigBottleService.processReceipt(request, vo);
         return apiResponse;
     }
 

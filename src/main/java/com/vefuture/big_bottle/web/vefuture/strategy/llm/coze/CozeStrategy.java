@@ -46,9 +46,10 @@ public class CozeStrategy implements LlmStrategy {
         String walletAddress = requestModel.getWalletAddress();
         String imgUrl = requestModel.getImgUrl();
         String llm = requestModel.getLlm();
+        String ipAddress = requestModel.getIpAddress();
         try {
             //创建Log
-            Long processLogId = processLogService.createLog(processId, walletAddress, imgUrl);
+            Long processLogId = processLogService.createLog(ipAddress,processId, walletAddress, imgUrl);
             //1 构造请求参数
             ParameterEntity parameterEntity = new ParameterEntity();
             parameterEntity.setImg_url(imgUrl);

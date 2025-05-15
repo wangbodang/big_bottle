@@ -8,6 +8,8 @@ import com.vefuture.big_bottle.web.vefuture.entity.vo.CardInfoVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.CountLimitVo;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.InBlackListDto;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * <p>
  * vefuture bigbottle 基本信息表 服务类
@@ -25,7 +27,7 @@ public interface BVefutureBigBottleService extends IService<BVefutureBigBottle> 
      * @return  返回值说明
      */
 
-    ApiResponse processReceipt(BigBottleQueryDTO vo);
+    ApiResponse processReceipt(HttpServletRequest request, BigBottleQueryDTO vo);
 
     /**
      *

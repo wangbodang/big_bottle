@@ -37,6 +37,9 @@ public class ProcessLog implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+    @TableField("ip_address")
+    private String ipAddress;
+
     /**
      * 流程ID，全流程使用
      */
