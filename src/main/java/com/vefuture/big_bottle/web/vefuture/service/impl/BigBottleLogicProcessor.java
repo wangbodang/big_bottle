@@ -221,10 +221,10 @@ public class BigBottleLogicProcessor extends ServiceImpl<BVefutureBigBottleMappe
             throw new IllegalStateException("Mapper注入失败！");
         }
         AsyncProcessReceiptTask asycTask = new AsyncProcessReceiptTask(requestModel, ws, mapper, llmStrategy, deplastStrategyContext, pointStrategyContext);
-        taskManager.submitTask(process_id, asycTask);
+        //taskManager.submitTask(process_id, asycTask);
+        taskManager.submitSerialTask(process_id, asycTask);
 
         //RetinfoBigBottle retinfoBigBottle = llmStrategy.call(requestModel);
-
 
     }
 

@@ -26,30 +26,17 @@ import java.util.concurrent.*;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
+
 public class TaskManager {
 
     private final Map<String, TaskInfo> taskStatusMap = new ConcurrentHashMap<>();
     private final Map<String, Future<?>> taskFutureMap = new ConcurrentHashMap<>();
+    @Autowired
     @Qualifier(value = "threadPoolTaskExecutor")
-    private final ThreadPoolTaskExecutor executor;
-
-    //自己创建一个线程池
-    /*
-    @PostConstruct
-    public void init() {
-        executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("TaskManager-");
-        executor.initialize();
-    }
-    @PreDestroy
-    public void shutdown() {
-        executor.shutdown();
-    }
-    */
+    private ThreadPoolTaskExecutor executor;
+    @Autowired
+    @Qualifier(value = "singleThreadExecutor") // 引用单线程池
+    private ExecutorService serialExecutor;
 
     /**
      * 提交一个异步任务（自动生成taskId）
@@ -72,6 +59,25 @@ public class TaskManager {
             } catch (Exception e) {
                 updateStatus(taskId, TaskStatus.FAILED, e.getMessage());
                 log.error("Task {} execution failed", taskId, e);
+            }
+        });
+        taskFutureMap.put(taskId, future);
+        return taskId;
+    }
+
+    /**
+     * 提交一个“顺序执行”的任务（顺序线程池）
+     */
+    public String submitSerialTask(String taskId, Runnable task) {
+        taskStatusMap.put(taskId, new TaskInfo(TaskStatus.PENDING, null));
+        Future<?> future = serialExecutor.submit(() -> {
+            try {
+                updateStatus(taskId, TaskStatus.RUNNING, null);
+                task.run();
+                updateStatus(taskId, TaskStatus.SUCCESS, null);
+            } catch (Exception e) {
+                updateStatus(taskId, TaskStatus.FAILED, e.getMessage());
+                log.error("Serial Task {} 执行失败", taskId, e);
             }
         });
         taskFutureMap.put(taskId, future);

@@ -22,14 +22,13 @@ import com.vefuture.big_bottle.web.websocket.WsSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -50,8 +49,6 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
     @Autowired
     private BigBottleLogicProcessor bottleLogicProcessor;
     private final WsSessionManager ws;
-    @Autowired
-    private ExecutorService threadPoolExecutor;
     @Autowired
     private IBlackListService blackListService;
     @Value("${bigbottle.counttimes.max:10}")

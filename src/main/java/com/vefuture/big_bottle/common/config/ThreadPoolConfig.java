@@ -9,9 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
+
 /**
  * @author wangb
  * @date 2025/3/26
@@ -33,6 +32,10 @@ public class ThreadPoolConfig
     // 线程池维护线程所允许的空闲时间
     private int keepAliveSeconds = 300;
 
+    /**
+     * 普通线程池
+     * @return
+     */
     @Bean(name = "threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor()
     {
@@ -44,6 +47,26 @@ public class ThreadPoolConfig
         // 线程池对拒绝任务(无线程可用)的处理策略
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         return executor;
+    }
+
+    /**
+     *
+     * 单线程池
+     * @return
+     */
+    @Bean(name = "singleThreadExecutor")
+    public ExecutorService singleThreadExecutor() {
+        return new ThreadPoolExecutor(
+                1, 1,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(100),  // 可排队100个任务，超过将被拒绝
+                r -> {
+                    Thread t = new Thread(r);
+                    t.setName("serial-executor-thread");
+                    return t;
+                },
+                new ThreadPoolExecutor.AbortPolicy()  // 超过100个任务直接报错
+        );
     }
 
     /**
