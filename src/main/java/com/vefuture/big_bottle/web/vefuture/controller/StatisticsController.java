@@ -2,6 +2,7 @@ package com.vefuture.big_bottle.web.vefuture.controller;
 
 import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
+import com.vefuture.big_bottle.web.vefuture.entity.qo.BigBottleQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.qo.StatisticsQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.StatisticsResultDTO;
 import com.vefuture.big_bottle.web.vefuture.service.StatisticsService;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author wangb
@@ -36,5 +40,22 @@ public class StatisticsController {
         }
         return ApiResponse.success(resultDTO);
     }
-
+    @RequestMapping("/recalpoint")
+    public ApiResponse reCalPoint(){
+        log.info("===> 重新计算积分:");
+        statisticsService.reCalPoint();
+        return ApiResponse.success();
+    }
+    //导出
+    @PostMapping("/statistics/export")
+    public void export(HttpServletRequest request, HttpServletResponse response, @RequestBody StatisticsQueryDTO dto){
+        log.info("===> 导出的请求参数为:{}", dto);
+        try {
+            statisticsService.reCalPoint();
+            statisticsService.exportCsv(request, response, dto);
+        } catch (Exception e) {
+            log.error("CSV导出失败：{}", e.getMessage(), e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

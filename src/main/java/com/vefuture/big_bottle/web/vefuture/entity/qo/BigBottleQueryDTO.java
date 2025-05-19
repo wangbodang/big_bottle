@@ -2,6 +2,8 @@ package com.vefuture.big_bottle.web.vefuture.entity.qo;
 
 import lombok.Data;
 
+import java.time.OffsetDateTime;
+
 /**
  * @author wangb
  * @date 2025/3/15
@@ -19,8 +21,8 @@ public class BigBottleQueryDTO {
     //图片地址
     private String imgUrl;
     //
-    private String startDate;
-    private String endDate;
+    private OffsetDateTime startDate;
+    private OffsetDateTime endDate;
     //is_time_threshold retinfo_is_availd
     private Boolean isTimeThreshold;
     private Boolean retinfoIsAvaild;

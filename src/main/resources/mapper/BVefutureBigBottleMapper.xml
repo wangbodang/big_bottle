@@ -35,13 +35,12 @@
                 AND t.wallet_address like '%'|| #{qo.walletAddress} || '%'
             </if>
             <!-- … 其它条件 … -->
-            <if test="qo.startDate != null and qo.startDate != ''">
-                AND t.create_time &gt;= #{qo.startDate}::timestamp
+            <if test="qo.startDate != null">
+                AND t.create_time &gt;= #{qo.startDate}
             </if>
-            <if test="qo.endDate != null and qo.endDate != ''">
-                AND t.create_time &lt; #{qo.endDate}::timestamp
+            <if test="qo.endDate != null">
+                AND t.create_time &lt;= #{qo.endDate}
             </if>
-
             <if test="qo.isTimeThreshold != null">
                 AND t.is_time_threshold = #{qo.isTimeThreshold}
             </if>

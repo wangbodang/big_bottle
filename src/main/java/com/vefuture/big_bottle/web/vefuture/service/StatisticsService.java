@@ -3,6 +3,9 @@ package com.vefuture.big_bottle.web.vefuture.service;
 import com.vefuture.big_bottle.web.vefuture.entity.qo.StatisticsQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.StatisticsResultDTO;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @author wangb
  * @date 2025/5/17
@@ -10,4 +13,8 @@ import com.vefuture.big_bottle.web.vefuture.entity.vo.StatisticsResultDTO;
  */
 public interface StatisticsService {
     StatisticsResultDTO getStatisticsReult(StatisticsQueryDTO dto);
+    //导出CSV
+    void exportCsv(HttpServletRequest request, HttpServletResponse response, StatisticsQueryDTO dto);
+
+    void reCalPoint();
 }

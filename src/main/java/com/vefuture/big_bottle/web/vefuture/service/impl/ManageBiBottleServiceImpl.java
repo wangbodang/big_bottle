@@ -55,6 +55,12 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
 
     @Override
     public Page<ManageBigBottleVo> getBigBottleList(HttpServletRequest request, Page<ManageBigBottleVo> page, BigBottleQueryDTO qo) {
+        //处理时间
+        //处理endDate:
+        if (qo.getEndDate() != null) {
+            qo.setEndDate(qo.getEndDate().plusSeconds(86399)); // 或 plusDays(1).minusSeconds(1)
+        }
+
         Page<ManageBigBottleVo> manageBigBottleList = bigBottleMapper.getManageBigBottleList(page, qo);
         //设置图像名字
         List<ManageBigBottleVo> records = manageBigBottleList.getRecords();
