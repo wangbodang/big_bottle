@@ -31,6 +31,7 @@ public class StatisticsController {
         try {
             resultDTO = statisticsService.getStatisticsReult(dto);
         } catch (Exception e) {
+            log.error("====> 统计出错:{}", e.getMessage(), e);
             return ApiResponse.error(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage());
         }
         return ApiResponse.success(resultDTO);

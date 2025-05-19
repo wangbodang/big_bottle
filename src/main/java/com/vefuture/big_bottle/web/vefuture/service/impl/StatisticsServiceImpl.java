@@ -35,8 +35,26 @@ public class StatisticsServiceImpl implements StatisticsService {
             dto.setEndDate(dto.getEndDate().plusSeconds(86399)); // 或 plusDays(1).minusSeconds(1)
         }
         StatisticsResultDTO resultDTO = new StatisticsResultDTO();
+
+        //指定日期钱包总数
         Integer walletAddressCount = statisticsMapper.queryWalletAddressCount(dto);
         resultDTO.setWalletAddressCount(walletAddressCount);
+        //指定日期图片总数
+        Integer totalImageCount = statisticsMapper.getTotalImageCount(dto);
+        resultDTO.setTotalImageCount(totalImageCount);
+        //指定时间内通过的地址数
+        Integer passedAddressCount = statisticsMapper.getPassedAddressCount(dto);
+        resultDTO.setPassedAddressCount(passedAddressCount);
+        //指定时间内通过的小票数
+        Integer passedReceiptCount = statisticsMapper.getPassedReceiptCount(dto);
+        resultDTO.setPassedReceiptCount(passedReceiptCount);
+        //指定时间驳回的的地址数(无效):
+        Integer unpassedAddressCount = statisticsMapper.getUnpassedAddressCount(dto);
+        resultDTO.setUnpassedAddressCount(unpassedAddressCount);
+        //指定时间内驳回的小票数(无效):
+        Integer unpassedReceiptCount = statisticsMapper.getunpassedReceiptCount(dto);
+        resultDTO.setUnpassedReceiptCount(unpassedReceiptCount);
+
         return resultDTO;
     }
 }

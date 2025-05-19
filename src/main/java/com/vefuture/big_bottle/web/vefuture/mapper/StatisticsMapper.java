@@ -11,5 +11,17 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface StatisticsMapper {
+
+    //统计指定日期使用的钱包 不在黑名单内的
     Integer queryWalletAddressCount(@Param("qo") StatisticsQueryDTO dto);
+    //统计指定日期处理的小票数 不在黑名单内的
+    Integer getTotalImageCount(@Param("qo") StatisticsQueryDTO dto);
+
+    Integer getPassedAddressCount(@Param("qo") StatisticsQueryDTO dto);
+
+    Integer getPassedReceiptCount(@Param("qo") StatisticsQueryDTO dto);
+
+    Integer getUnpassedAddressCount(@Param("qo") StatisticsQueryDTO dto);
+
+    Integer getunpassedReceiptCount(@Param("qo") StatisticsQueryDTO dto);
 }

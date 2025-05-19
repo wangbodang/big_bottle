@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vefuture.big_bottle.web.vefuture.mapper.StatisticsMapper">
-    <!-- 统计指定日期使用的钱包 不在黑名单内的 -->
+    <!-- 统计 指定日期使用的钱包 不在黑名单内的 -->
     <select id="queryWalletAddressCount" resultType="Integer">
-        select count(distinct wallet_address)
+        select count(distinct t.wallet_address)
         from b_vefuture_big_bottle t
         /*where t.wallet_address not in (select  wallet_address from b_vef_black_list where black_type in (1, 3))*/
         <where>
@@ -21,6 +21,103 @@
         </where>
     </select>
 
-    <!--统计指定日期的小票-->
+    <!-- 统计 指定日期处理的小票数 不在黑名单内的 -->
+    <select id="getTotalImageCount" resultType="Integer">
+        select count(distinct t.img_url)
+        from b_vefuture_big_bottle t
+        <where>
+            NOT EXISTS (
+                select 1 from b_vef_black_list b
+                where b.wallet_address = t.wallet_address and b.black_type in (1, 3)
+            )
+            <!-- … 其它条件 … -->
+            <if test="qo.startDate != null">
+                AND t.create_time &gt;= #{qo.startDate}
+            </if>
+            <if test="qo.endDate != null">
+                AND t.create_time &lt;= #{qo.endDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 统计 指定时间内通过的地址数 不在黑名单内的 -->
+    <select id="getPassedAddressCount" resultType="Integer">
+        select count(distinct t.wallet_address)
+        from b_vefuture_big_bottle t
+        <where>
+            t.is_delete = '0' and
+            NOT EXISTS (
+            select 1 from b_vef_black_list b
+            where b.wallet_address = t.wallet_address and b.black_type in (1, 3)
+            )
+            <!-- … 其它条件 … -->
+            <if test="qo.startDate != null">
+                AND t.create_time &gt;= #{qo.startDate}
+            </if>
+            <if test="qo.endDate != null">
+                AND t.create_time &lt;= #{qo.endDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 统计 指定时间内通过的小票数 不在黑名单内的 -->
+    <select id="getPassedReceiptCount" resultType="Integer">
+        select count(distinct t.img_url)
+        from b_vefuture_big_bottle t
+        <where>
+            t.is_delete = '0' and
+            NOT EXISTS (
+            select 1 from b_vef_black_list b
+            where b.wallet_address = t.wallet_address and b.black_type in (1, 3)
+            )
+            <!-- … 其它条件 … -->
+            <if test="qo.startDate != null">
+                AND t.create_time &gt;= #{qo.startDate}
+            </if>
+            <if test="qo.endDate != null">
+                AND t.create_time &lt;= #{qo.endDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 统计 指定时间驳回的的地址数 不在黑名单内的 -->
+    <select id="getUnpassedAddressCount" resultType="Integer">
+        select count(distinct t.wallet_address)
+        from b_vefuture_big_bottle t
+        <where>
+            t.is_delete = '1' and
+            NOT EXISTS (
+            select 1 from b_vef_black_list b
+            where b.wallet_address = t.wallet_address and b.black_type in (1, 3)
+            )
+            <!-- … 其它条件 … -->
+            <if test="qo.startDate != null">
+                AND t.create_time &gt;= #{qo.startDate}
+            </if>
+            <if test="qo.endDate != null">
+                AND t.create_time &lt;= #{qo.endDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 统计 指定时间内驳回的小票数(无效) 不在黑名单内的 -->
+    <select id="getunpassedReceiptCount" resultType="Integer">
+        select count(distinct t.img_url)
+        from b_vefuture_big_bottle t
+        <where>
+            t.is_delete = '1' and
+            NOT EXISTS (
+            select 1 from b_vef_black_list b
+            where b.wallet_address = t.wallet_address and b.black_type in (1, 3)
+            )
+            <!-- … 其它条件 … -->
+            <if test="qo.startDate != null">
+                AND t.create_time &gt;= #{qo.startDate}
+            </if>
+            <if test="qo.endDate != null">
+                AND t.create_time &lt;= #{qo.endDate}
+            </if>
+        </where>
+    </select>
 
 </mapper>

@@ -10,7 +10,18 @@ import lombok.Data;
 @Data
 public class StatisticsResultDTO {
 
+    /*
+        const wallet_address_count = ref('0')
+        const total_image_count = ref('0')
+        const passed_address_count = ref('0')
+        const passed_receipt_count = ref('0')
+        const unpassed_address_count = ref('0')
+        const unpassed_receipt_count = ref('0')
+    */
     private Integer walletAddressCount = 0;
-    private Integer availdReceiptCount = 0;
-    private Integer invalidReceiptCount = 0;
+    private Integer totalImageCount = 0;
+    private Integer passedAddressCount = 0;
+    private Integer passedReceiptCount = 0;
+    private Integer unpassedAddressCount = 0;
+    private Integer unpassedReceiptCount = 0;
 }
