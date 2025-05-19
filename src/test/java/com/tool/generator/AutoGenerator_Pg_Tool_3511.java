@@ -118,7 +118,7 @@ public class AutoGenerator_Pg_Tool_3511 {
                             .entityBuilder()
                             .enableFileOverride() // Enable override for entity if needed
                             .idType(IdType.ASSIGN_ID)  // ✅ 使用雪花 ID
-                            .logicDeleteColumnName("is_delete") // ✅ 开启逻辑删除支持 (Ensure column exists)
+                            //.logicDeleteColumnName("is_delete") // ✅ 开启逻辑删除支持 (Ensure column exists)
                             .enableLombok()//实体类使用lombok
                             .enableTableFieldAnnotation()//加上字段注解@TableField
                             .addIgnoreColumns(strings)//添加要忽略的数据库中列

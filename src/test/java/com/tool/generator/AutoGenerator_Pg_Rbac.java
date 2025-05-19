@@ -113,7 +113,7 @@ public class AutoGenerator_Pg_Rbac {
                 //策略配置
                 .strategyConfig(builder -> {
                     builder.addInclude(tables)
-                            .addTablePrefix("sys_")  // ✅ 这句会自动去掉 sys_，实体类名仍是 UserEntity 等
+                            .addTablePrefix("b_vef_")  // ✅ 这句会自动去掉 sys_，实体类名仍是 UserEntity 等
                             //.addTablePrefix("CUX_KS_")//表名前缀，配置后生成的代码不会有此前缀
                             .serviceBuilder()
                                 .enableFileOverride()
@@ -121,7 +121,7 @@ public class AutoGenerator_Pg_Rbac {
                                 .formatServiceImplFileName("%sServiceImpl")//服务层实现类名后缀
                             .entityBuilder()
                                 .idType(IdType.ASSIGN_ID)  // ✅ 添加这一行，使用雪花 ID
-                                .logicDeleteColumnName("is_delete") // ✅ 开启逻辑删除支持
+                                //.logicDeleteColumnName("is_delete") // ✅ 开启逻辑删除支持
                                 .enableFileOverride()
                                 .enableLombok()//实体类使用lombok,需要自己引入依赖
                                 //.logicDeleteColumnName("status")//逻辑删除字段，使用delete方法删除数据时会将status设置为1。调用update方法时并不会将该字段放入修改字段中，而是在条件字段中
@@ -161,9 +161,10 @@ public class AutoGenerator_Pg_Rbac {
                 "sys_user_roles",
                 "sys_resources",
                 "sys_role_resources"
-                "b_vef_process_log"*/
+                "b_vef_process_log"
                 "sys_oper_log",
-                "sys_login_info"
+                "sys_login_info"*/
+                "sys_config"
         };
         List<String> tempList = Arrays.asList(nameArr);
         List<String> result = new ArrayList<>();
