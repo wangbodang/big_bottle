@@ -1,8 +1,6 @@
 package com.vefuture.big_bottle.web.vefuture.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.vefuture.big_bottle.common.exception.BusinessException;
@@ -21,6 +19,7 @@ import com.vefuture.big_bottle.web.vefuture.service.StatisticsService;
 import com.vefuture.big_bottle.web.vefuture.strategy.points.PointStrategyContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletOutputStream;
@@ -31,7 +30,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,8 +54,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Autowired
     private BlackListMapper blackListMapper;
     //总计积分
+    @Value("${bigbottle.deliver.sum_token:10000}")
     private Integer sumToken = 1000;
-    private Integer tokenLimit = 20;
+    @Value("${bigbottle.deliver.receipt_token_limit:10}")
+    private Integer receiptTokenLimit = 10;
+    @Value("${bigbottle.deliver.wallet_token_limit:50}")
+    private Integer walletTokenLimit = 50;
 
     @Override
     public StatisticsResultDTO getStatisticsReult(StatisticsQueryDTO dto) {
@@ -158,8 +160,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         bigBottleQueryDto.setCurrent(1);
         bigBottleQueryDto.setSize(Integer.MAX_VALUE);
         // todo
-        //bigBottleQueryDto.setIsTimeThreshold(false);
-        //bigBottleQueryDto.setRetinfoIsAvaild(true);
+        bigBottleQueryDto.setIsTimeThreshold(false);
+        bigBottleQueryDto.setRetinfoIsAvaild(true);
         bigBottleQueryDto.setStartDate(dto.getStartDate());
         bigBottleQueryDto.setEndDate(dto.getEndDate());
         bigBottleQueryDto.setIsDelete("0");
@@ -189,8 +191,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         //超过20的置为20
         fixedReceiptList.parallelStream().forEach(receipt -> {
             receipt.setPreB3trToken(receipt.getReceiptPoint());
-            if(receipt.getReceiptPoint() > tokenLimit){
-                receipt.setPreB3trToken(tokenLimit);
+            if(receipt.getReceiptPoint() > receiptTokenLimit){
+                receipt.setPreB3trToken(receiptTokenLimit);
             }
         });
 
@@ -229,8 +231,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         //对每个map, 削去大于50的值
         for (Map.Entry<String, Integer> entry : sumTokenMap.entrySet()) {
-            if (entry.getValue() > 50) {
-                entry.setValue(50);  // 直接修改原 Map
+            if (entry.getValue() > walletTokenLimit) {
+                entry.setValue(walletTokenLimit);  // 直接修改原 Map
             }
         }
 

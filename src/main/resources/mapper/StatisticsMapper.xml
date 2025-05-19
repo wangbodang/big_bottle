@@ -45,7 +45,7 @@
         select count(distinct t.wallet_address)
         from b_vefuture_big_bottle t
         <where>
-            t.is_delete = '0' and
+            t.is_delete = '0' and t.retinfo_is_availd = true and t.is_time_threshold = false and
             NOT EXISTS (
             select 1 from b_vef_black_list b
             where b.wallet_address = t.wallet_address and b.black_type in (1, 3)
@@ -65,7 +65,7 @@
         select count(distinct t.img_url)
         from b_vefuture_big_bottle t
         <where>
-            t.is_delete = '0' and
+            t.is_delete = '0' and t.retinfo_is_availd = true and t.is_time_threshold = false and
             NOT EXISTS (
             select 1 from b_vef_black_list b
             where b.wallet_address = t.wallet_address and b.black_type in (1, 3)
@@ -85,7 +85,7 @@
         select count(distinct t.wallet_address)
         from b_vefuture_big_bottle t
         <where>
-            t.is_delete = '1' and
+            (t.is_delete = '1' or t.retinfo_is_availd = false or t.is_time_threshold = true) and
             NOT EXISTS (
             select 1 from b_vef_black_list b
             where b.wallet_address = t.wallet_address and b.black_type in (1, 3)
@@ -105,7 +105,7 @@
         select count(distinct t.img_url)
         from b_vefuture_big_bottle t
         <where>
-            t.is_delete = '1' and
+            (t.is_delete = '1' or t.retinfo_is_availd = false or t.is_time_threshold = true) and
             NOT EXISTS (
             select 1 from b_vef_black_list b
             where b.wallet_address = t.wallet_address and b.black_type in (1, 3)
