@@ -21,4 +21,5 @@ public class BlackListQueryDTO {
     private String walletAddress;
     private Integer blackType;
     private List<Integer> blackTypes;
+    private String ipAddress;
 }

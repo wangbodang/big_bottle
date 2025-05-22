@@ -21,6 +21,9 @@ public class ManageBigBottleVo {
     private String processId;
 
     private Integer blackType; //拉黑状态
+    private String ipAddress;
+    private Integer associatedCount;
+    private String associatedAddresses;
 
     private String walletAddress;
     private String imgUrl;

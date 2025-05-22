@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * @author wangb
@@ -72,15 +73,15 @@ public class DifyStrategy implements LlmStrategy {
                     .build();
 
             //更新AI开始时间
-            processLogService.updateAiStartTime(processLogId, LocalDateTime.now());
+            processLogService.updateAiStartTime(processLogId, OffsetDateTime.now());
             Response response = client.newCall(request).execute();
             //更新AI结束时间
-            processLogService.updateAiEndTime(processLogId, LocalDateTime.now());
+            processLogService.updateAiEndTime(processLogId, OffsetDateTime.now());
 
             String retJsonString = response.body().string();
             log.info("---> 返回值为:{}", retJsonString);
             //更新AI返回日志
-            processLogService.updateAiReturnMsg(processLogId, LocalDateTime.now(), retJsonString);
+            processLogService.updateAiReturnMsg(processLogId, OffsetDateTime.now(), retJsonString);
 
             ResponseModelDTO retDifyDTO = JSON.parseObject(retJsonString, ResponseModelDTO.class);
             RetinfoBigBottle outputs = retDifyDTO.getData().getOutputs();

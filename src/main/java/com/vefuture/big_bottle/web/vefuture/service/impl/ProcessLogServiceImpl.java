@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * <p>
@@ -28,7 +29,7 @@ public class ProcessLogServiceImpl extends ServiceImpl<ProcessLogMapper, Process
         processLog.setWalletAddress(walletAddress);
         processLog.setImgUrl(imgUrl);
         processLog.setIsDelete(false);
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         processLog.setCreateTime(now);
         processLog.setUpdateTime(now);
         this.save(processLog);
@@ -38,7 +39,7 @@ public class ProcessLogServiceImpl extends ServiceImpl<ProcessLogMapper, Process
     }
 
     @Override
-    public void updateAiStartTime(Long processLogId, LocalDateTime now) {
+    public void updateAiStartTime(Long processLogId, OffsetDateTime now) {
         ProcessLog processLog = new ProcessLog();
         processLog.setId(processLogId);
         processLog.setAiProcessStartTime(now);
@@ -47,7 +48,7 @@ public class ProcessLogServiceImpl extends ServiceImpl<ProcessLogMapper, Process
     }
 
     @Override
-    public void updateAiEndTime(Long processLogId, LocalDateTime now) {
+    public void updateAiEndTime(Long processLogId, OffsetDateTime now) {
         ProcessLog processLog = new ProcessLog();
         processLog.setId(processLogId);
         processLog.setAiProcessEndTime(now);
@@ -56,7 +57,7 @@ public class ProcessLogServiceImpl extends ServiceImpl<ProcessLogMapper, Process
     }
 
     @Override
-    public void updateAiReturnMsg(Long processLogId, LocalDateTime now, String retJsonString) {
+    public void updateAiReturnMsg(Long processLogId, OffsetDateTime now, String retJsonString) {
         ProcessLog processLog = new ProcessLog();
         processLog.setId(processLogId);
         processLog.setAiProcessEndTime(now);

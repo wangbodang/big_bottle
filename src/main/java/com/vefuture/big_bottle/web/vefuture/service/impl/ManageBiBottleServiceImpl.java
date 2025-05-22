@@ -12,11 +12,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.web.vefuture.entity.BVefutureBigBottle;
 import com.vefuture.big_bottle.web.vefuture.entity.BlackList;
+import com.vefuture.big_bottle.web.vefuture.entity.ProcessLog;
 import com.vefuture.big_bottle.web.vefuture.entity.qo.BigBottleQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.qo.BlackListQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.vo.ManageBigBottleVo;
 import com.vefuture.big_bottle.web.vefuture.mapper.BVefutureBigBottleMapper;
 import com.vefuture.big_bottle.web.vefuture.mapper.BlackListMapper;
+import com.vefuture.big_bottle.web.vefuture.mapper.ProcessLogMapper;
 import com.vefuture.big_bottle.web.vefuture.service.IBlackListService;
 import com.vefuture.big_bottle.web.vefuture.service.IManageBiBottleService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +34,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +52,8 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
     private IBlackListService blackListService;
     @Autowired
     private BlackListMapper blackListMapper;
+    @Autowired
+    private ProcessLogMapper processLogMapper;
 
     @Override
     public Page<ManageBigBottleVo> getBigBottleList(HttpServletRequest request, Page<ManageBigBottleVo> page, BigBottleQueryDTO qo) {
@@ -66,9 +68,30 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
         List<ManageBigBottleVo> records = manageBigBottleList.getRecords();
         records.forEach(manageBigBottleVo -> {
             String imgUrl = manageBigBottleVo.getImgUrl();
+            String ipAddress = manageBigBottleVo.getIpAddress();
             manageBigBottleVo.setImgName(imgUrl.substring(imgUrl.lastIndexOf("/")+1));
+            //设置数量和钱包地址
+            setAssociated(manageBigBottleVo, ipAddress);
         });
         return page;
+    }
+    //获取IP关联的地址数和地址
+    private void setAssociated(ManageBigBottleVo vo, String ipAddress) {
+        LambdaQueryWrapper<ProcessLog> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ProcessLog::getIpAddress, ipAddress);
+        List<ProcessLog> processLogs = processLogMapper.selectList(queryWrapper);
+        if(CollectionUtil.isEmpty(processLogs)){
+            vo.setAssociatedAddresses("");
+            vo.setAssociatedCount(0);
+            return;
+        }
+        Set<String> addressSet = new HashSet<>();
+        for (int i = 0; i < processLogs.size(); i++) {
+            addressSet.add(processLogs.get(i).getWalletAddress());
+        }
+        vo.setAssociatedCount(addressSet.size());
+        String addressJoin = String.join("$", addressSet);
+        vo.setAssociatedAddresses(addressJoin);
     }
 
     @Override
@@ -190,5 +213,44 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
         } catch (IOException e) {
             throw new BusinessException("导出失败!");
         }
+    }
+
+    @Override
+    public void blackIp(BlackListQueryDTO dto) {
+        String  ipAddress = dto.getIpAddress();
+        if(StrUtil.isBlank(ipAddress)){
+            throw new BusinessException("参数IP地址为空");
+        }
+        //查出IP关联的所有地址
+        LambdaQueryWrapper<ProcessLog> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ProcessLog::getIpAddress, ipAddress);
+        List<ProcessLog> processLogs = processLogMapper.selectList(queryWrapper);
+        if(CollectionUtil.isEmpty(processLogs)){
+            return;
+        }
+        Set<String> addressSet = new HashSet<>();
+        for (int i = 0; i < processLogs.size(); i++) {
+            addressSet.add(processLogs.get(i).getWalletAddress());
+        }
+        addressSet.forEach(address -> {
+            LambdaQueryWrapper<BlackList> blackListQueryWrapper = new LambdaQueryWrapper<>();
+            blackListQueryWrapper.eq(BlackList::getWalletAddress, address);
+            List<BlackList> blackLists = blackListMapper.selectList(blackListQueryWrapper);
+            if(CollectionUtil.isEmpty(blackLists)){
+                BlackList temp = new BlackList();
+                temp.setWalletAddress(address);
+                temp.setBlackType(1);
+                blackListMapper.insert(temp);
+                return;
+            }
+            if(CollectionUtil.isNotEmpty(blackLists)){
+                BlackList blackList = blackLists.get(0);
+                if(blackList.getBlackType() != 1){
+                    blackList.setBlackType(1);
+                    blackListMapper.updateById(blackList);
+                }
+            }
+
+        });
     }
 }

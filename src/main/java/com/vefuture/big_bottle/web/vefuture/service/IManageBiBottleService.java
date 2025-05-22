@@ -31,4 +31,6 @@ public interface IManageBiBottleService {
 
 
     void exportCsv(HttpServletRequest request, HttpServletResponse response, BigBottleQueryDTO dto);
+
+    void blackIp(BlackListQueryDTO dto);
 }

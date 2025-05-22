@@ -98,7 +98,15 @@ public class ManageBigBottleController {
 
         return ApiResponse.success("地址已加入黑名单");
     }
-
+    @PostMapping("/ip/blacklist")
+    public ApiResponse blackIp(@RequestBody BlackListQueryDTO dto){
+        try {
+            manageBiBottleService.blackIp(dto);
+        } catch (Exception e) {
+            log.error("===>>>拉黑IP相关的地址异常:{}", e.getMessage(), e);
+        }
+        return ApiResponse.success("IP关联的钱包已拉黑");
+    }
     //导出
     @PostMapping("/bigbottlelist/export")
     public void export(HttpServletRequest request, HttpServletResponse response, @RequestBody BigBottleQueryDTO dto){
