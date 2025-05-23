@@ -7,13 +7,8 @@
             MIN(t.id)                         AS id,
             string_agg(t.id::text, ',')             AS ids,
             t.wallet_address,
-            COALESCE(
-            (SELECT black_type
-            FROM b_vef_black_list
-            WHERE wallet_address = t.wallet_address),
-            0
-            )                                 AS black_type,
-            max(l.ip_address)                  AS ip_address,
+            COALESCE(min(bl.black_type), 0)        AS black_type,
+            max(l.ip_address)                 AS ip_address,
             t.img_url,
             MIN(t.process_id)                 AS process_id,
             BOOL_AND(t.retinfo_is_availd)     AS retinfo_is_availd,
@@ -26,7 +21,9 @@
             count(1)                          AS drink_kind,
             sum(t.drink_point)                AS receipt_point,
             BOOL_OR(t.is_delete = '1')        AS is_delete
-        FROM b_vefuture_big_bottle t left join b_vef_process_log l on t.process_id = l.process_id
+        FROM b_vefuture_big_bottle t
+            left join b_vef_process_log l on t.process_id = l.process_id
+            LEFT JOIN b_vef_black_list bl ON bl.wallet_address = t.wallet_address
         <where>
             <if test="qo.isDelete != null and qo.isDelete != ''">
                 AND t.is_delete = #{qo.isDelete}
