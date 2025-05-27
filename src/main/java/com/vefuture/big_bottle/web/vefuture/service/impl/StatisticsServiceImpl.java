@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -149,10 +150,33 @@ public class StatisticsServiceImpl implements StatisticsService {
             writer.close();
 
         } catch (IOException e) {
-            throw new BusinessException("导出失败!");
+            log.error("===>>>>>>>导出失败: {}", e.getMessage());
+            e.printStackTrace();
+            throw new BusinessException("导出失败!" + e.getMessage());
         }
     }
+    public void exportCsvStream(OutputStream outputStream, StatisticsQueryDTO dto) {
+        try (OutputStreamWriter osw = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+             BufferedWriter writer = new BufferedWriter(osw)) {
 
+            writer.write('\ufeff'); // BOM 防乱码
+            writer.write("address,amount,reason");
+            writer.newLine();
+
+            List<B3tyTokenTransDto> list = getB3tyTokenList(dto);
+
+            for (B3tyTokenTransDto item : list) {
+                writer.write(String.format("%s,%s,%s",
+                        item.getWalletAddress(),
+                        item.getB3tyToken(),
+                        item.getImgUrl()));
+                writer.newLine();
+                writer.flush(); // 建议每写一行就 flush 一下，避免积压
+            }
+        } catch (IOException e) {
+            log.warn("导出过程中发生异常：{}", e.getMessage());
+        }
+    }
     //获取发币列表
     private List<B3tyTokenTransDto> getB3tyTokenList(StatisticsQueryDTO dto) {
         HttpServletRequest request = null;

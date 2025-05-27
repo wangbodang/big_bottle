@@ -5,6 +5,7 @@ import com.vefuture.big_bottle.web.vefuture.entity.vo.StatisticsResultDTO;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 
 /**
  * @author wangb
@@ -17,4 +18,6 @@ public interface StatisticsService {
     void exportCsv(HttpServletRequest request, HttpServletResponse response, StatisticsQueryDTO dto);
 
     void reCalPoint();
+
+    void exportCsvStream(OutputStream outputStream, StatisticsQueryDTO dto);
 }
