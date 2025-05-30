@@ -145,8 +145,8 @@ public class BVefutureBigBottleController {
                 return ApiResponse.error(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("===> 异常消息:{}", e.getMessage());
+
+            log.error("===> 异常消息:{}", e);
             throw new BusinessException(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage(), e);
         }
     }

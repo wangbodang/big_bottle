@@ -105,7 +105,7 @@ public class ImageExifTest {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

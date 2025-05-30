@@ -150,8 +150,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             writer.close();
 
         } catch (IOException e) {
-            log.error("===>>>>>>>导出失败: {}", e.getMessage());
-            e.printStackTrace();
+            log.error("===>>>>>>>导出失败", e.getMessage());
             throw new BusinessException("导出失败!" + e.getMessage());
         }
     }

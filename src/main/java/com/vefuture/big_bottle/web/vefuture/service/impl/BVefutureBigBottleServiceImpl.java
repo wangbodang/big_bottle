@@ -206,8 +206,7 @@ public class BVefutureBigBottleServiceImpl extends ServiceImpl<BVefutureBigBottl
             log.error("===> 业务异常:{}", businessException.getMessage());
             return ApiResponse.error(businessException.getCode(), businessException.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error("===> 业务异常:{}", e.getMessage());
+            log.error("===> 业务异常", e);
             return ApiResponse.error(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage());
         }
         return ApiResponse.success();

@@ -68,7 +68,7 @@ public class OkHttpTest {
             System.out.println("Name: " + json.getString("name"));
             System.out.println("Email: " + json.getString("email"));
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
     }

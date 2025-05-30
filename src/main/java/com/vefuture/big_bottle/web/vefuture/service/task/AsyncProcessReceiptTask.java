@@ -55,49 +55,62 @@ public class AsyncProcessReceiptTask implements Runnable{
 
     @Override
     public void run() {
-        if (requestModel == null || ws == null || bigBottleMapper == null || llmStrategy == null || deplastStrategyContext == null) {
-            log.error("AsyncProcessReceiptTask参数异常：requestModel={}, ws={}, bigBottleMapper={}, llmStrategy={}, deplastStrategyContext={}",
-                    requestModel, ws, bigBottleMapper, llmStrategy, deplastStrategyContext);
-            return;
-        }
-        log.info("-========++++++++++++++> 线程开始执行:{}", DateUtil.formatDateTime(new Date()));
-        //log.info("-========++++++++++++++> 休眠20秒钟,再处理图片!");
         try {
-            ws.sendToUser(requestModel.getWalletAddress(), "图片处理任务准备开始 code:200; time:"+ DateUtil.formatDateTime(new Date()));
-            //Thread.sleep(20*1000);
-            String walletAddress = requestModel.getWalletAddress();
-            String imgUrl = requestModel.getImgUrl();
-            String process_id = requestModel.getProcess_id();
-            String llm = requestModel.getLlm();
-
-            RetinfoBigBottle retinfoBigBottle = llmStrategy.call(requestModel);
-
-            //以当前时间作为插入时间
-            LocalDateTime currentTime = LocalDateTime.now();
-            if(!retinfoBigBottle.getRetinfoIsAvaild()){
-                log.info("---> 该票据信息不完整");
-                //return ApiResponse.error(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
-                //throw new BusinessException(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
-                //存一个空信息到库里
-                saveNullReceiptToDb(requestModel, currentTime);
+            if (requestModel == null || ws == null || bigBottleMapper == null || llmStrategy == null || deplastStrategyContext == null) {
+                log.error("AsyncProcessReceiptTask参数异常：requestModel={}, ws={}, bigBottleMapper={}, llmStrategy={}, deplastStrategyContext={}",
+                        requestModel, ws, bigBottleMapper, llmStrategy, deplastStrategyContext);
                 return;
             }
-
-            //todo 存到数据库 此处处理ExifInfo及减塑量的问题
-            ImageSourceDetector.DetectionResult detectionResult = new ImageSourceDetector.DetectionResult(ImageSourceDetector.ImageOrigin.UNKNOWN, ImageSourceDetector.DeviceType.UNKNOWN);
+            log.info("-========++++++++++++++> 线程开始执行:{}", DateUtil.formatDateTime(new Date()));
+            //log.info("-========++++++++++++++> 休眠20秒钟,再处理图片!");
             try {
-                detectionResult = ImageSourceDetector.detect(imgUrl);
-            } catch (ImageProcessingException | IOException e) {
-                log.error("===> 判定图片Exif信息异常:{}", e.getMessage());
-            }
-            saveToDb(requestModel, retinfoBigBottle, currentTime, detectionResult);
+                ws.sendToUser(requestModel.getWalletAddress(), "图片处理任务准备开始 code:200; time:"+ DateUtil.formatDateTime(new Date()));
+                //Thread.sleep(20*1000);
+                String walletAddress = requestModel.getWalletAddress();
+                String imgUrl = requestModel.getImgUrl();
+                String process_id = requestModel.getProcess_id();
+                String llm = requestModel.getLlm();
 
-            //todo 此处消息分发到指定的前端
-            //ws.sendToUser(requestModel.getWalletAddress(), "图片处理任务已完成 code:200; time:"+ DateUtil.formatDateTime(new Date()));
-        }  catch (Exception e) {
-            log.error("AsyncProcessReceiptTask执行异常", e);
+                RetinfoBigBottle retinfoBigBottle = llmStrategy.call(requestModel);
+
+                //以当前时间作为插入时间
+                LocalDateTime currentTime = LocalDateTime.now();
+                if(!retinfoBigBottle.getRetinfoIsAvaild()){
+                    log.info("---> 该票据信息不完整");
+                    //return ApiResponse.error(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
+                    //throw new BusinessException(ResultCode.RECEIPT_ERR_UNAVAILABLE.getCode(), ResultCode.RECEIPT_ERR_UNAVAILABLE.getMessage());
+                    //存一个空信息到库里
+                    saveNullReceiptToDb(requestModel, currentTime);
+                    return;
+                }
+
+                //todo 存到数据库 此处处理ExifInfo及减塑量的问题
+                ImageSourceDetector.DetectionResult detectionResult = new ImageSourceDetector.DetectionResult(ImageSourceDetector.ImageOrigin.UNKNOWN, ImageSourceDetector.DeviceType.UNKNOWN);
+                try {
+                    detectionResult = ImageSourceDetector.detect(imgUrl);
+                } catch (ImageProcessingException | IOException e) {
+                    log.error("===> 判定图片Exif信息异常:{}", e.getMessage());
+                }
+                saveToDb(requestModel, retinfoBigBottle, currentTime, detectionResult);
+
+                //todo 此处消息分发到指定的前端
+                //ws.sendToUser(requestModel.getWalletAddress(), "图片处理任务已完成 code:200; time:"+ DateUtil.formatDateTime(new Date()));
+            }  catch (Exception e) {
+                log.error("AsyncProcessReceiptTask执行异常", e);
+            }
+            log.info("-========++++++++++++++> 线程结束执行:{}", DateUtil.formatDateTime(new Date()));
+        } catch (Exception e) {
+            log.error("===>>>AsyncProcessReceiptTask 执行异常", e);
+            //throw new RuntimeException(e);
+        } finally {
+            requestModel = null;
+            ws = null;
+            bigBottleMapper = null;
+            llmStrategy = null;
+            deplastStrategyContext = null;
+            pointStrategyContext = null;
+
         }
-        log.info("-========++++++++++++++> 线程结束执行:{}", DateUtil.formatDateTime(new Date()));
     }
 
     //空的时候也要一个流程ID

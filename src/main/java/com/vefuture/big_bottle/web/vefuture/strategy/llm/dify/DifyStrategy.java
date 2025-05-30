@@ -88,11 +88,11 @@ public class DifyStrategy implements LlmStrategy {
 
             return outputs;
         } catch (BusinessException businessException){
-            log.error("===> 业务异常:{}", businessException.getMessage());
+            log.error("===> 业务异常:", businessException);
             throw new BusinessException(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error("===> 业务异常:{}", e.getMessage());
+
+            log.error("===> 业务异常", e);
             throw new RuntimeException("业务异常", e);
         }
     }
