@@ -74,14 +74,23 @@
 
         <!-- caffeine缓存 -->
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-            <version>3.1.8</version>
+            <version>2.9.3</version> <!-- 你也可以用 2.9.x（兼容性更好） -->
         </dependency>
         <!-- 添加监控健康 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- 验证框架 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
         <!-- mybatis-plus -->
@@ -258,6 +267,7 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
+
 
     </dependencies>
 

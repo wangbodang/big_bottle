@@ -20,4 +20,6 @@ public interface StatisticsService {
     void reCalPoint();
 
     void exportCsvStream(OutputStream outputStream, StatisticsQueryDTO dto);
+
+    StatisticsResultDTO caculateToken(HttpServletRequest request, StatisticsQueryDTO dto);
 }

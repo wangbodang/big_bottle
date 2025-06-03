@@ -18,6 +18,7 @@ import com.vefuture.big_bottle.web.vefuture.service.IManageBiBottleService;
 import com.vefuture.big_bottle.web.vefuture.service.StatisticsService;
 import com.vefuture.big_bottle.web.vefuture.strategy.points.PointStrategyContext;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,51 +46,46 @@ import java.util.stream.Collectors;
 public class StatisticsServiceImpl implements StatisticsService {
 
     @Autowired
-    private IManageBiBottleService manageBiBottleService;
-    @Autowired
     private PointStrategyContext pointStrategyContext;
     @Autowired
     private BVefutureBigBottleMapper bigBottleMapper;
     @Autowired
     private StatisticsMapper statisticsMapper;
     @Autowired
-    private BlackListMapper blackListMapper;
-    //总计积分
-    @Value("${bigbottle.deliver.sum_token:10000}")
-    private Integer sumToken = 1000;
-    @Value("${bigbottle.deliver.receipt_token_limit:10}")
-    private Integer receiptTokenLimit = 10;
-    @Value("${bigbottle.deliver.wallet_token_limit:50}")
-    private Integer walletTokenLimit = 50;
+    private StatisticsLogicProcessor statisticsLogicProcessor;
 
+    /**
+     * 统计页面首页
+     * @param dto
+     * @return
+     */
     @Override
     public StatisticsResultDTO getStatisticsReult(StatisticsQueryDTO dto) {
-        log.info("===>>> 查询参数为:{}", dto);
+        log.info("获取统计信息时查询参数为:{}", dto);
         //处理endDate:
         if (dto.getEndDate() != null) {
             dto.setEndDate(dto.getEndDate().plusSeconds(86399)); // 或 plusDays(1).minusSeconds(1)
         }
-        StatisticsResultDTO resultDTO = new StatisticsResultDTO();
+        //获取统计信息
+        StatisticsResultDTO resultDTO = statisticsLogicProcessor.getStatisticsResultDTO(dto);
+        return resultDTO;
+    }
 
-        //指定日期钱包总数
-        Integer walletAddressCount = statisticsMapper.queryWalletAddressCount(dto);
-        resultDTO.setWalletAddressCount(walletAddressCount);
-        //指定日期图片总数
-        Integer totalImageCount = statisticsMapper.getTotalImageCount(dto);
-        resultDTO.setTotalImageCount(totalImageCount);
-        //指定时间内通过的地址数
-        Integer passedAddressCount = statisticsMapper.getPassedAddressCount(dto);
-        resultDTO.setPassedAddressCount(passedAddressCount);
-        //指定时间内通过的小票数
-        Integer passedReceiptCount = statisticsMapper.getPassedReceiptCount(dto);
-        resultDTO.setPassedReceiptCount(passedReceiptCount);
-        //指定时间驳回的的地址数(无效):
-        Integer unpassedAddressCount = statisticsMapper.getUnpassedAddressCount(dto);
-        resultDTO.setUnpassedAddressCount(unpassedAddressCount);
-        //指定时间内驳回的小票数(无效):
-        Integer unpassedReceiptCount = statisticsMapper.getunpassedReceiptCount(dto);
-        resultDTO.setUnpassedReceiptCount(unpassedReceiptCount);
-
+    /**
+     * 重新计算积分和代币的关系
+     * @param request
+     * @param dto
+     * @return
+     */
+    @Override
+    public StatisticsResultDTO caculateToken(HttpServletRequest request, StatisticsQueryDTO dto) {
+        log.info("重新计算积分和代币值时的参数为:{}", dto);
+        //处理endDate:
+        if (dto.getEndDate() != null) {
+            dto.setEndDate(dto.getEndDate().plusSeconds(86399)); // 或 plusDays(1).minusSeconds(1)
+        }
+        //获取统计信息
+        StatisticsResultDTO resultDTO = statisticsLogicProcessor.getStatisticsResultDTO(dto);
         return resultDTO;
     }
 
@@ -135,7 +131,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
             // 查询数据（你应该根据 dto 查询出数据）
             // 替换为你实际的方法
-            List<B3tyTokenTransDto> b3tyTokenTransDTOList = getB3tyTokenList(dto);
+            List<B3tyTokenTransDto> b3tyTokenTransDTOList = statisticsLogicProcessor.getB3tyTokenList(dto);
             // 写入数据行
             for (B3tyTokenTransDto item : b3tyTokenTransDTOList) {
                 writer.write(String.format("%s,%s,%s",
@@ -162,7 +158,8 @@ public class StatisticsServiceImpl implements StatisticsService {
             writer.write("address,amount,reason");
             writer.newLine();
 
-            List<B3tyTokenTransDto> list = getB3tyTokenList(dto);
+            //获取发币列表
+            List<B3tyTokenTransDto> list = statisticsLogicProcessor.getB3tyTokenList(dto);
 
             for (B3tyTokenTransDto item : list) {
                 writer.write(String.format("%s,%s,%s",
@@ -173,113 +170,10 @@ public class StatisticsServiceImpl implements StatisticsService {
                 writer.flush(); // 建议每写一行就 flush 一下，避免积压
             }
         } catch (IOException e) {
-            log.warn("导出过程中发生异常：{}", e.getMessage());
+            log.warn("[exportCsvStream]导出过程中发生异常", e);
         }
     }
-    //获取发币列表
-    private List<B3tyTokenTransDto> getB3tyTokenList(StatisticsQueryDTO dto) {
-        HttpServletRequest request = null;
-        BigBottleQueryDTO bigBottleQueryDto = new BigBottleQueryDTO();
-        bigBottleQueryDto.setCurrent(1);
-        bigBottleQueryDto.setSize(Integer.MAX_VALUE);
-        // todo
-        bigBottleQueryDto.setIsTimeThreshold(false);
-        bigBottleQueryDto.setRetinfoIsAvaild(true);
-        bigBottleQueryDto.setStartDate(dto.getStartDate());
-        bigBottleQueryDto.setEndDate(dto.getEndDate());
-        bigBottleQueryDto.setIsDelete("0");
 
-        Page<ManageBigBottleVo> page = new Page<>(bigBottleQueryDto.getCurrent(), bigBottleQueryDto.getSize());
-        Page<ManageBigBottleVo> manageBigBottleVoList = manageBiBottleService.getBigBottleList(request, page, bigBottleQueryDto);
-        List<ManageBigBottleVo> receiptList = manageBigBottleVoList.getRecords();
-
-        LambdaQueryWrapper<BlackList> blackListLambdaQw = new LambdaQueryWrapper<>();
-        blackListLambdaQw.in(BlackList::getBlackType, 1, 3);
-        List<BlackList> blackLists = blackListMapper.selectList(blackListLambdaQw);
-        log.info("===> 黑名单数量为:{}", blackLists.size());
-
-        // 提取 list2 中的 id 到 Set，提升 contains 性能
-        Set<String> walletBlackSet = blackLists.stream()
-                .map(BlackList::getWalletAddress)
-                .collect(Collectors.toSet());
-
-        List<ManageBigBottleVo> fixedReceiptList = receiptList.stream()
-                .filter(bottle -> !walletBlackSet.contains(bottle.getWalletAddress()))
-                .collect(Collectors.toList());
-        log.info("===>查询出所有的小票据条数:{}", receiptList.size());
-        log.info("====> 适合的小票数量为:{}", fixedReceiptList.size());
-
-        log.info("===> 其中一张小票为:{}", fixedReceiptList.get(fixedReceiptList.size() / 2));
-
-        //超过20的置为20
-        fixedReceiptList.parallelStream().forEach(receipt -> {
-            receipt.setPreB3trToken(receipt.getReceiptPoint());
-            if(receipt.getReceiptPoint() > receiptTokenLimit){
-                receipt.setPreB3trToken(receiptTokenLimit);
-            }
-        });
-
-        Integer totalToken = fixedReceiptList.stream()
-                .mapToInt(ManageBigBottleVo::getPreB3trToken)
-                .sum();
-        log.info("===> 本次总Token为:{}", totalToken);
-
-        //统计一下每个地址有几张小票
-        Map<String, Integer> receiptNumMap = new HashMap<>();
-        fixedReceiptList.stream().forEach(receipt -> {
-            if(receiptNumMap.get(receipt.getWalletAddress()) == null){
-                receiptNumMap.put(receipt.getWalletAddress(), 1);
-            }else{
-                receiptNumMap.put(receipt.getWalletAddress(), receiptNumMap.get(receipt.getWalletAddress()) +1 );
-            }
-        });
-        int sumRec = receiptNumMap.values().stream()
-                .mapToInt(Integer::intValue)
-                .sum();
-        log.info("===> 验证总票数:{}, 应等于原总票数:{}", sumRec, fixedReceiptList.size());
-
-        //统计一下每个地址的总积分
-        Map<String, Integer> sumTokenMap = new HashMap<>();
-        fixedReceiptList.stream().forEach(receipt -> {
-            if(sumTokenMap.get(receipt.getWalletAddress()) == null){
-                sumTokenMap.put(receipt.getWalletAddress(), receipt.getPreB3trToken());
-            }else{
-                sumTokenMap.put(receipt.getWalletAddress(), sumTokenMap.get(receipt.getWalletAddress()) + receipt.getPreB3trToken() );
-            }
-        });
-        int sumToken = sumTokenMap.values().stream()
-                .mapToInt(Integer::intValue)
-                .sum();
-        log.info("===> 验证总积分:{}, 应等于原总积分:{}", sumToken, totalToken);
-
-        //对每个map, 削去大于50的值
-        for (Map.Entry<String, Integer> entry : sumTokenMap.entrySet()) {
-            if (entry.getValue() > walletTokenLimit) {
-                entry.setValue(walletTokenLimit);  // 直接修改原 Map
-            }
-        }
-
-        //设定一个结果Map
-        Map<String, Integer> resultMap = new HashMap<>();
-        for (Map.Entry<String, Integer> entry : sumTokenMap.entrySet()) {
-            resultMap.put(entry.getKey(), entry.getValue()/receiptNumMap.get(entry.getKey()));
-        }
-        //填入结果
-        fixedReceiptList.forEach( receipt -> {
-            receipt.setFinalB3trToken(resultMap.get(receipt.getWalletAddress()));
-        });
-
-        List<B3tyTokenTransDto> result = fixedReceiptList.stream()
-                .map(vo -> {
-                    B3tyTokenTransDto tokenTransDto = new B3tyTokenTransDto();
-                    tokenTransDto.setWalletAddress(vo.getWalletAddress());
-                    tokenTransDto.setImgUrl(vo.getImgUrl());
-                    tokenTransDto.setB3tyToken(vo.getFinalB3trToken()); // 映射字段名不同
-                    return tokenTransDto;
-                })
-                .collect(Collectors.toList());
-        return result;
-    }
 
 
 }

@@ -9,11 +9,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ApiResponse handleValidationException(MethodArgumentNotValidException e) {
+        BindingResult result = e.getBindingResult();
+        StringBuilder msg = new StringBuilder("参数校验失败：");
+        for (FieldError error : result.getFieldErrors()) {
+            msg.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("; ");
+        }
+        return ApiResponse.error(ResultCode.PARAM_ERROR.getCode(), msg.toString());
+    }
 
     @ExceptionHandler(BlacklistException.class)
     public ApiResponse handleBlacklistException(BlacklistException ex) {

@@ -45,12 +45,28 @@ public class StatisticsController {
         }
         return ApiResponse.success(resultDTO);
     }
+
+    /**
+     * 这个方法是重新计算那些没有积分的小票信息
+     * @return
+     */
     @RequestMapping("/recalpoint")
     public ApiResponse reCalPoint(){
         log.info("===> 重新计算积分:");
         statisticsService.reCalPoint();
         return ApiResponse.success();
     }
+
+    /**
+     * 计算本次积分和代币
+     * @return
+     */
+    @PostMapping("/statistics/calculate")
+    public ApiResponse<StatisticsResultDTO> calculateToken(HttpServletRequest request, HttpServletResponse response, @RequestBody StatisticsQueryDTO dto){
+        StatisticsResultDTO resultDTO = statisticsService.caculateToken(request, dto);
+        return ApiResponse.success(resultDTO);
+    }
+
     //导出
     @PostMapping("/statistics/export")
     public ResponseEntity<StreamingResponseBody> export(HttpServletRequest request, HttpServletResponse response, @RequestBody StatisticsQueryDTO dto){

@@ -100,7 +100,7 @@ public class AsyncProcessReceiptTask implements Runnable{
             }
             log.info("-========++++++++++++++> 线程结束执行:{}", DateUtil.formatDateTime(new Date()));
         } catch (Exception e) {
-            log.error("===>>>AsyncProcessReceiptTask 执行异常", e);
+            log.error("处理小票失败, walletAddress={}, imgUrl={}, 异常如下: ", requestModel.getWalletAddress(), requestModel.getImgUrl(), e);
             //throw new RuntimeException(e);
         } finally {
             requestModel = null;

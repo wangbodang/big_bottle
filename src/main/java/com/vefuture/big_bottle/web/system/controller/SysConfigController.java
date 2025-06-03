@@ -2,6 +2,7 @@ package com.vefuture.big_bottle.web.system.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.vefuture.big_bottle.common.domain.ApiResponse;
+import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.web.system.entity.SysConfig;
 import com.vefuture.big_bottle.web.system.entity.query.SysConfigQueryDTO;
 import com.vefuture.big_bottle.web.system.service.SysConfigService;
@@ -51,6 +52,18 @@ public class SysConfigController {
 
         Page<SysConfig> blackList = sysConfigService.getSysConfigList(request, page, dto);
         return ApiResponse.success(blackList);
+    }
+
+    /**
+     * 修改配置
+     * @return
+     */
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    public ApiResponse updateConfig(HttpServletRequest request,
+                                                      HttpServletResponse response,
+                                                      @RequestBody SysConfigQueryDTO dto){
+        sysConfigService.updateConfig(request, dto);
+        return ApiResponse.success();
     }
 
 }

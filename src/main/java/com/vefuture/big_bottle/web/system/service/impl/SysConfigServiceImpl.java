@@ -1,6 +1,7 @@
 package com.vefuture.big_bottle.web.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -8,11 +9,11 @@ import com.vefuture.big_bottle.web.system.entity.SysConfig;
 import com.vefuture.big_bottle.web.system.entity.query.SysConfigQueryDTO;
 import com.vefuture.big_bottle.web.system.mapper.SysConfigMapper;
 import com.vefuture.big_bottle.web.system.service.SysConfigService;
-import com.vefuture.big_bottle.web.vefuture.entity.BlackList;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * <p>
@@ -37,4 +38,36 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
                 .orderByDesc(SysConfig::getId);
         return this.page(page, queryWrapper);
     }
+
+
+    /**
+     * 利用缓存提高查找效率
+     * @param configKey
+     * @return
+     */
+    @Override
+    @Cacheable(cacheNames = "config", key = "#configKey")
+    public String getConfigValue(String configKey) {
+        SysConfig config = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, configKey));
+        return config != null ? config.getConfigValue() : null;
+    }
+
+    /**
+     * 更新时使缓存失效
+     * @param request
+     * @param dto
+     */
+    @CacheEvict(cacheNames = "config", key = "#dto.configKey")
+    @Override
+    public void updateConfig(HttpServletRequest request, SysConfigQueryDTO dto) {
+        LambdaUpdateWrapper<SysConfig> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(SysConfig::getConfigKey, dto.getConfigKey());
+        updateWrapper.set(SysConfig::getConfigValue, dto.getConfigValue());
+        boolean update = this.update(updateWrapper);
+        if(!update){
+            throw new RuntimeException("修改失败");
+        }
+    }
+
+
 }

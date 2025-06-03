@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.vefuture.big_bottle.web.system.entity.query.SysConfigQueryDTO;
 import com.vefuture.big_bottle.web.vefuture.entity.BlackList;
 import com.vefuture.big_bottle.web.vefuture.entity.qo.BlackListQueryDTO;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,4 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 public interface SysConfigService extends IService<SysConfig> {
 
     Page<SysConfig> getSysConfigList(HttpServletRequest request, Page<SysConfig> page, SysConfigQueryDTO dto);
+
+    @Cacheable(cacheNames = "config", key = "#configKey")
+    String getConfigValue(String configKey);
+
+    void updateConfig(HttpServletRequest request, SysConfigQueryDTO dto);
 }

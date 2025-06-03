@@ -2,6 +2,8 @@ package com.vefuture.big_bottle.web.vefuture.entity.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author wangb
  * @date 2025/5/17
@@ -24,4 +26,9 @@ public class StatisticsResultDTO {
     private Integer passedReceiptCount = 0;
     private Integer unpassedAddressCount = 0;
     private Integer unpassedReceiptCount = 0;
+
+    //系数
+    private BigDecimal conversionFactor;
+    //本次计算出的总积分
+    private Integer sumToken;
 }

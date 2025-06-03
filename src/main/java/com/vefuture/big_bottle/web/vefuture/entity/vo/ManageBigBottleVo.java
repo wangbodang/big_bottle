@@ -49,6 +49,8 @@ public class ManageBigBottleVo {
     private Integer drinkKind;  //饮料数量
     private Integer receiptPoint; //小票积分
 
+    //计算之前的积分
     private Integer preB3trToken;
+    //计算之后的积分
     private Integer finalB3trToken;
 }
