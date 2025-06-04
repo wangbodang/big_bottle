@@ -14,9 +14,11 @@ import com.vefuture.big_bottle.web.vefuture.mapper.StatisticsMapper;
 import com.vefuture.big_bottle.web.vefuture.service.IManageBiBottleService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -101,6 +103,8 @@ public class StatisticsLogicProcessor {
 
     //获取发币列表
     public List<B3tyTokenTransDto> getB3tyTokenList(StatisticsQueryDTO dto) {
+        //用StopWatch计算各个查询用的时间
+        StopWatch stopWatch = new StopWatch();
         //查询出小票列表
         HttpServletRequest request = null;
         BigBottleQueryDTO bigBottleQueryDto = new BigBottleQueryDTO();
@@ -114,14 +118,23 @@ public class StatisticsLogicProcessor {
         bigBottleQueryDto.setIsDelete("0");
 
         Page<ManageBigBottleVo> page = new Page<>(bigBottleQueryDto.getCurrent(), bigBottleQueryDto.getSize());
+
+        stopWatch.start("Search1");
         Page<ManageBigBottleVo> manageBigBottleVoList = manageBiBottleService.getBigBottleList(request, page, bigBottleQueryDto);
+        stopWatch.stop();
+
         List<ManageBigBottleVo> receiptList = manageBigBottleVoList.getRecords();
 
         LambdaQueryWrapper<BlackList> blackListLambdaQw = new LambdaQueryWrapper<>();
         blackListLambdaQw.in(BlackList::getBlackType, 1, 3);
+
+        stopWatch.start("Search2");
         List<BlackList> blackLists = blackListMapper.selectList(blackListLambdaQw);
+        stopWatch.stop();
+
         log.info("===> 黑名单数量为:{}", blackLists.size());
 
+        stopWatch.start("Search3");
         // 提取 list2 中的 id 到 Set，提升 contains 性能
         Set<String> walletBlackSet = blackLists.stream()
                 .map(BlackList::getWalletAddress)
@@ -217,6 +230,20 @@ public class StatisticsLogicProcessor {
                     return tokenTransDto;
                 })
                 .collect(Collectors.toList());
+        stopWatch.stop();
+
+        // 最终打印
+        printStopWatchInSeconds(stopWatch, log);
         return result;
+    }
+
+    public static void printStopWatchInSeconds(StopWatch stopWatch, Logger tLog) {
+        for (StopWatch.TaskInfo task : stopWatch.getTaskInfo()) {
+            long millis = task.getTimeMillis();
+            String secondsFormatted = String.format("%.3f", millis / 1000.0);
+            tLog.info("任务 [{}] 耗时: {} ms(约 {} 秒)", task.getTaskName(), millis, secondsFormatted);
+        }
+        String totalSeconds = String.format("%.3f", stopWatch.getTotalTimeMillis() / 1000.0);
+        tLog.info("总耗时: {} ms(约 {} 秒)", stopWatch.getTotalTimeMillis(), totalSeconds);
     }
 }

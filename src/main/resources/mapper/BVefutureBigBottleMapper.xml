@@ -22,7 +22,7 @@
             sum(t.drink_point)                AS receipt_point,
             BOOL_OR(t.is_delete = '1')        AS is_delete
         FROM b_vefuture_big_bottle t
-            left join b_vef_process_log l on t.process_id = l.process_id
+            LEFT join b_vef_process_log l on t.process_id = l.process_id
             LEFT JOIN b_vef_black_list bl ON bl.wallet_address = t.wallet_address
         <where>
             <if test="qo.isDelete != null and qo.isDelete != ''">

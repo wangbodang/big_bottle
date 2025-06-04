@@ -71,10 +71,61 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
             String ipAddress = manageBigBottleVo.getIpAddress();
             manageBigBottleVo.setImgName(imgUrl.substring(imgUrl.lastIndexOf("/")+1));
             //设置数量和钱包地址
-            setAssociated(manageBigBottleVo, ipAddress);
+            //setAssociated(manageBigBottleVo, ipAddress);
         });
+
+        // 批量处理 setAssociated，替代原 forEach 中的方法
+        // 注意：setAssociatedBatch(records) 必须在 forEach 外部执行！
+        // 否则会形成 O(N^2) 查询，严重拖慢大数据统计场景。
+        setAssociatedBatch(records);
         return page;
     }
+
+    // 批量处理 setAssociated，替代原 forEach 中的方法
+    public void setAssociatedBatch(List<ManageBigBottleVo> records) {
+        // 1. 收集 IP
+        Set<String> ipSet = records.stream()
+                .map(ManageBigBottleVo::getIpAddress)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        if (ipSet.isEmpty()) return;
+
+        // 2. 分批查询 ProcessLog，避免 IN 太长卡死
+        List<ProcessLog> allLogs = new ArrayList<>();
+        List<String> ipList = new ArrayList<>(ipSet);
+        int batchSize = 300;  // 保守一点
+
+        for (int i = 0; i < ipList.size(); i += batchSize) {
+            List<String> batch = ipList.subList(i, Math.min(i + batchSize, ipList.size()));
+            List<ProcessLog> part = processLogMapper.selectList(
+                    new LambdaQueryWrapper<ProcessLog>().in(ProcessLog::getIpAddress, batch)
+            );
+            allLogs.addAll(part);
+        }
+
+        // 3. 构造 IP => Wallet 映射
+        Map<String, Set<String>> ipWalletMap = new HashMap<>(1024);
+        for (ProcessLog log : allLogs) {
+            String ip = log.getIpAddress();
+            String wallet = log.getWalletAddress();
+            if (ip == null || wallet == null) continue;
+            ipWalletMap.computeIfAbsent(ip, k -> new HashSet<>()).add(wallet);
+        }
+
+        // 4. 写回结果
+        for (ManageBigBottleVo vo : records) {
+            String ip = vo.getIpAddress();
+            Set<String> wallets = ipWalletMap.getOrDefault(ip, Collections.emptySet());
+            vo.setAssociatedCount(wallets.size());
+            vo.setAssociatedAddresses(String.join("$", wallets));
+        }
+    }
+
+    //这个查询太慢 forEach + setAssociated	可能 N 次数据库/API 请求，极有可能是瓶颈 ❗
+    //这就是典型的 N+1 查询问题，即：
+    //主查询一次性查出了 N 条数据
+    //然后每条都要再查一次数据库
     //获取IP关联的地址数和地址
     private void setAssociated(ManageBigBottleVo vo, String ipAddress) {
         LambdaQueryWrapper<ProcessLog> queryWrapper = new LambdaQueryWrapper<>();
