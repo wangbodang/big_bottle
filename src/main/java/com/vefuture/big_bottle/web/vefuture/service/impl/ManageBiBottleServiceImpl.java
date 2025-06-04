@@ -83,7 +83,9 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
 
     // 批量处理 setAssociated，替代原 forEach 中的方法
     public void setAssociatedBatch(List<ManageBigBottleVo> records) {
-        // 1. 收集 IP
+        if (records == null || records.isEmpty()) return;
+
+        // 1. 提取 IP（去重、非空）
         Set<String> ipSet = records.stream()
                 .map(ManageBigBottleVo::getIpAddress)
                 .filter(Objects::nonNull)
@@ -91,36 +93,49 @@ public class ManageBiBottleServiceImpl implements IManageBiBottleService {
 
         if (ipSet.isEmpty()) return;
 
-        // 2. 分批查询 ProcessLog，避免 IN 太长卡死
+        // 2. 分批查询 ProcessLog
         List<ProcessLog> allLogs = new ArrayList<>();
         List<String> ipList = new ArrayList<>(ipSet);
-        int batchSize = 300;  // 保守一点
+        int totalSize = ipList.size();
+        int batchSize = Math.max(200, Math.min(1000, totalSize / 10)); // 动态设置批大小
 
-        for (int i = 0; i < ipList.size(); i += batchSize) {
-            List<String> batch = ipList.subList(i, Math.min(i + batchSize, ipList.size()));
+        for (int i = 0; i < totalSize; i += batchSize) {
+            List<String> batch = ipList.subList(i, Math.min(i + batchSize, totalSize));
             List<ProcessLog> part = processLogMapper.selectList(
                     new LambdaQueryWrapper<ProcessLog>().in(ProcessLog::getIpAddress, batch)
             );
             allLogs.addAll(part);
         }
 
-        // 3. 构造 IP => Wallet 映射
-        Map<String, Set<String>> ipWalletMap = new HashMap<>(1024);
+        if (allLogs.isEmpty()) return;
+
+        // 3. 构建 Map<ip, List<wallet_address>>
+        Map<String, List<String>> ipWalletListMap = new HashMap<>(1024);
         for (ProcessLog log : allLogs) {
             String ip = log.getIpAddress();
             String wallet = log.getWalletAddress();
             if (ip == null || wallet == null) continue;
-            ipWalletMap.computeIfAbsent(ip, k -> new HashSet<>()).add(wallet);
+            ipWalletListMap
+                    .computeIfAbsent(ip, k -> new ArrayList<>())
+                    .add(wallet);
         }
 
-        // 4. 写回结果
+        // 4. 写回每条记录（去重 + 拼接）
         for (ManageBigBottleVo vo : records) {
             String ip = vo.getIpAddress();
-            Set<String> wallets = ipWalletMap.getOrDefault(ip, Collections.emptySet());
-            vo.setAssociatedCount(wallets.size());
-            vo.setAssociatedAddresses(String.join("$", wallets));
+            List<String> wallets = ipWalletListMap.get(ip);
+
+            if (wallets == null || wallets.isEmpty()) {
+                vo.setAssociatedCount(0);
+                vo.setAssociatedAddresses("");
+            } else {
+                Set<String> walletSet = new HashSet<>(wallets);
+                vo.setAssociatedCount(walletSet.size());
+                vo.setAssociatedAddresses(String.join("$", walletSet));
+            }
         }
     }
+
 
     //这个查询太慢 forEach + setAssociated	可能 N 次数据库/API 请求，极有可能是瓶颈 ❗
     //这就是典型的 N+1 查询问题，即：
