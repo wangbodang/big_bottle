@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -50,7 +51,7 @@ public class ManageBigBottleVo {
     private Integer receiptPoint; //小票积分
 
     //计算之前的积分
-    private Integer preB3trToken;
+    private BigDecimal preB3trToken;
     //计算之后的积分
-    private Integer finalB3trToken;
+    private BigDecimal finalB3trToken;
 }

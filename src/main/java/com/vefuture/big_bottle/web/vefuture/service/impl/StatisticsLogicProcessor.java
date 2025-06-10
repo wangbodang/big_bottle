@@ -22,6 +22,7 @@ import org.springframework.util.StopWatch;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
@@ -92,12 +93,11 @@ public class StatisticsLogicProcessor {
         return resultDTO;
     }
     //计算总积分
-    private Integer getSumTokenByList(List<B3tyTokenTransDto> b3tyTokenList) {
+    private BigDecimal getSumTokenByList(List<B3tyTokenTransDto> b3tyTokenList) {
         log.info("===> 列表长度为:{}", b3tyTokenList.size());
         log.info("===> 列表的第一个数据为:{}", b3tyTokenList.get(0));
         log.info("===> 列表的最后一个数据为:{}", b3tyTokenList.get(b3tyTokenList.size()-1));
-        return b3tyTokenList.stream().mapToInt(B3tyTokenTransDto::getB3tyToken)
-                .sum();
+        return b3tyTokenList.stream().map(B3tyTokenTransDto::getB3tyToken).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 
@@ -153,17 +153,18 @@ public class StatisticsLogicProcessor {
         //比率
         BigDecimal conversionFactor = new BigDecimal(sysConfigService.getConfigValue("conversion_factor"));
 
-        //超过20的置为20
+        //超过20的置为20 此处用 BigDecimal
         fixedReceiptList.parallelStream().forEach(receipt -> {
-            receipt.setPreB3trToken(receipt.getReceiptPoint());
+            receipt.setPreB3trToken(BigDecimal.valueOf(receipt.getReceiptPoint()));
             if(receipt.getReceiptPoint() > receiptPointLimit){
-                receipt.setPreB3trToken(receiptPointLimit);
+                receipt.setPreB3trToken(BigDecimal.valueOf(receiptPointLimit));
             }
         });
 
-        Integer totalToken = fixedReceiptList.stream()
-                .mapToInt(ManageBigBottleVo::getPreB3trToken)
-                .sum();
+        //用BigDecimal求和
+        BigDecimal totalToken = fixedReceiptList.stream()
+                .map(ManageBigBottleVo::getPreB3trToken)  // 假设返回 BigDecimal
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         log.info("===> 本次总Token为:{}", totalToken);
 
         //统计一下每个地址有几张小票
@@ -181,17 +182,17 @@ public class StatisticsLogicProcessor {
         log.info("===> 验证总票数:{}, 应等于原总票数:{}", sumRec, fixedReceiptList.size());
 
         //统计一下每个地址的总积分
-        Map<String, Integer> sumTokenMap = new HashMap<>(2000);
+        Map<String, BigDecimal> sumTokenMap = new HashMap<>(2000);
         fixedReceiptList.stream().forEach(receipt -> {
             if(sumTokenMap.get(receipt.getWalletAddress()) == null){
                 sumTokenMap.put(receipt.getWalletAddress(), receipt.getPreB3trToken());
             }else{
-                sumTokenMap.put(receipt.getWalletAddress(), sumTokenMap.get(receipt.getWalletAddress()) + receipt.getPreB3trToken() );
+                //求和
+                sumTokenMap.put(receipt.getWalletAddress(), sumTokenMap.get(receipt.getWalletAddress()).add(receipt.getPreB3trToken()));
             }
         });
-        int sumToken = sumTokenMap.values().stream()
-                .mapToInt(Integer::intValue)
-                .sum();
+        BigDecimal sumToken = sumTokenMap.values().stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         log.info("===> 验证总积分:{}, 应等于原总积分:{}", sumToken, totalToken);
 
         //对每个map, 削去大于50的值 todo
@@ -205,19 +206,17 @@ public class StatisticsLogicProcessor {
         */
 
         //设定一个结果Map 里边只有地址和token数
-        Map<String, Integer> resultMap = new HashMap<>(2000);
-        for (Map.Entry<String, Integer> entry : sumTokenMap.entrySet()) {
+        Map<String, BigDecimal> resultMap = new HashMap<>(2000);
+        for (Map.Entry<String, BigDecimal> entry : sumTokenMap.entrySet()) {
             //用总值除以数量
-            resultMap.put(entry.getKey(), entry.getValue()/receiptNumMap.get(entry.getKey()));
+            resultMap.put(entry.getKey(), entry.getValue().divide(BigDecimal.valueOf(receiptNumMap.get(entry.getKey())), BigDecimal.ROUND_HALF_UP));
         }
         //填入结果
         fixedReceiptList.forEach( receipt -> {
-            //填入最后的数据 这里乘以系数并取整
-            Integer tempFinalTokey = resultMap.get(receipt.getWalletAddress());
-            BigDecimal multiplied = conversionFactor.multiply(BigDecimal.valueOf(tempFinalTokey));
-            // 四舍五入为整数
-            Integer finalTokey = multiplied.setScale(0, RoundingMode.HALF_UP).intValue();
-            receipt.setFinalB3trToken(finalTokey);
+            //填入最后的数据 这里乘以系数
+            BigDecimal tempFinalTokey = resultMap.get(receipt.getWalletAddress());
+            BigDecimal multiplied = conversionFactor.multiply(tempFinalTokey).setScale(1, RoundingMode.HALF_UP);
+            receipt.setFinalB3trToken(multiplied);
         });
         //获取CSV的数据列表
         List<B3tyTokenTransDto> result = fixedReceiptList.stream()

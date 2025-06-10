@@ -30,5 +30,5 @@ public class StatisticsResultDTO {
     //系数
     private BigDecimal conversionFactor;
     //本次计算出的总积分
-    private Integer sumToken;
+    private BigDecimal sumToken;
 }
