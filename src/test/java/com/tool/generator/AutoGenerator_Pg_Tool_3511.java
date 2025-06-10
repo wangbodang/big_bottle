@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * 代码生成器 使用3.5.11版本的生成器
  */
+@Deprecated
 @Slf4j
 public class AutoGenerator_Pg_Tool_3511 {
 

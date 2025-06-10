@@ -267,7 +267,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.9</version> <!-- 最新版本可以查一下 -->
+        </dependency>
 
     </dependencies>
 
@@ -292,6 +296,7 @@
                 <artifactId>mybatis</artifactId>
                 <version>3.5.13</version>
             </dependency>-->
+
         </dependencies>
     </dependencyManagement>
 

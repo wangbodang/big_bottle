@@ -100,7 +100,7 @@ public class AutoGenerator_Pg_Rbac {
                 //包配置
                 .packageConfig(builder -> {
                     builder.parent("com.vefuture.big_bottle.web")     //父包名
-                            .moduleName("system") // 设置父包模块名，这里一般不设置
+                            .moduleName("vefuture") // 设置父包模块名，这里一般不设置
                             .entity("entity")                 //Entity 包名
                             .service("service")             //	Service 包名
                             .serviceImpl("service.impl")    //Service Impl 包名
@@ -164,7 +164,7 @@ public class AutoGenerator_Pg_Rbac {
                 "b_vef_process_log"
                 "sys_oper_log",
                 "sys_login_info"*/
-                "sys_config"
+                "b_vef_sent_token"
         };
         List<String> tempList = Arrays.asList(nameArr);
         List<String> result = new ArrayList<>();
