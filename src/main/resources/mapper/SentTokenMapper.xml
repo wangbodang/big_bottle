@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vefuture.big_bottle.web.vefuture.mapper.SentTokenMapper">
+
+
+    <insert id="batchInsert">
+        insert into b_vef_sent_token (wallet_address, transaction_value, sent_token, img_url, transaction_url, create_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.walletAddress}, #{item.transactionValue}, #{item.sentToken}, #{item.imgUrl}, #{item.transactionUrl}, #{item.createTime})
+        </foreach>
+    </insert>
+</mapper>
