@@ -70,6 +70,8 @@ public class SentTokenServiceImpl extends ServiceImpl<SentTokenMapper, SentToken
                 .map(entity -> {
                     SentTokenVO vo = new SentTokenVO();
                     BeanUtils.copyProperties(entity, vo); // 你也可以手写映射逻辑
+                    //设置图片名字
+                    vo.setImgName(entity.getImgUrl().substring(entity.getImgUrl().lastIndexOf("/") + 1));
                     return vo;
                 })
                 .collect(Collectors.toList());

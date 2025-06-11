@@ -1,8 +1,10 @@
 package com.vefuture.big_bottle.web.vefuture.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 /**
  * @author wangb
@@ -33,6 +35,8 @@ public class SentTokenVO {
      */
     private String imgUrl;
 
+    private String  imgName;
+
     /**
      * 事务的全地址
      */
@@ -41,4 +45,7 @@ public class SentTokenVO {
     private String remark;
 
     private Boolean isDelete;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo")
+    private OffsetDateTime createTime;
 }
