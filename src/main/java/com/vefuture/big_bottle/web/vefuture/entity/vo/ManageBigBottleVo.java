@@ -23,8 +23,8 @@ public class ManageBigBottleVo {
 
     private Integer blackType; //拉黑状态
     private String ipAddress;
-    private Integer associatedCount;
-    private String associatedAddresses;
+    private Integer associatedCount; //关联地址数
+    private String associatedAddresses; //关联地址 用"$"符号分割
 
     private String walletAddress;
     private String imgUrl;
