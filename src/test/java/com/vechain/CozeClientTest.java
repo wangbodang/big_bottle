@@ -55,10 +55,10 @@ public class CozeClientTest {
 
 
         ParameterEntity parameterEntity = new ParameterEntity();
-        parameterEntity.setImg_url(img_url);
+        parameterEntity.setImgUrl(img_url);
         BodyEntity bodyEntity = new BodyEntity();
         bodyEntity.setWorkflow_id(workflow_id);
-        bodyEntity.setParameters(parameterEntity);
+        bodyEntity.setInputs(parameterEntity);
         Object bodyEntityJson = JSON.toJSON(bodyEntity);
         // 3. 使用 Gson（或 Jackson 等）将实体转换为 JSON 字符串
         String jsonString = JSON.toJSONString(bodyEntity);

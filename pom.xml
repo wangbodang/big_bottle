@@ -272,6 +272,13 @@
             <artifactId>opencsv</artifactId>
             <version>5.9</version> <!-- 最新版本可以查一下 -->
         </dependency>
+        <!-- 区块链加密工具 -->
+        <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>core</artifactId>
+            <version>4.10.0</version>
+        </dependency>
+
 
     </dependencies>
 

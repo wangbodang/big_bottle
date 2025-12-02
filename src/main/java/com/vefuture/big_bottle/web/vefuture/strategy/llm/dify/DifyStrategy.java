@@ -7,9 +7,6 @@ import com.vefuture.big_bottle.common.exception.BusinessException;
 import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import com.vefuture.big_bottle.web.vefuture.service.IProcessLogService;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.LlmStrategy;
-import com.vefuture.big_bottle.web.vefuture.strategy.llm.coze.entity.BodyEntity;
-import com.vefuture.big_bottle.web.vefuture.strategy.llm.coze.entity.ParameterEntity;
-import com.vefuture.big_bottle.web.vefuture.strategy.llm.coze.entity.RetinfoCozeJson;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.dify.entity.RequestModelDTO;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.dify.entity.ResponseModelDTO;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.domain.RequestModel;
@@ -20,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 /**
@@ -54,7 +50,7 @@ public class DifyStrategy implements LlmStrategy {
             RequestModelDTO.ImgUrl imgUrlDTO = new RequestModelDTO.ImgUrl();
             imgUrlDTO.setUrl(imgUrl);
             RequestModelDTO.Inputs inputs = new RequestModelDTO.Inputs();
-            inputs.setImg_url(imgUrlDTO);
+            inputs.setImage_url(imgUrlDTO);
             RequestModelDTO bodyEntity = new RequestModelDTO();
             bodyEntity.setInputs(inputs);
 

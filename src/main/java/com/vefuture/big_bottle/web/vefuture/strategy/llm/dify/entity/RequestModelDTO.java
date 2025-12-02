@@ -26,7 +26,7 @@ public class RequestModelDTO {
 
     @Data
     public static class Inputs {
-        private ImgUrl img_url;
+        private ImgUrl image_url;
     }
 
     @Data

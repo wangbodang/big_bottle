@@ -215,7 +215,7 @@ public class StatisticsLogicProcessor {
         fixedReceiptList.forEach( receipt -> {
             //填入最后的数据 这里乘以系数
             BigDecimal tempFinalTokey = resultMap.get(receipt.getWalletAddress());
-            BigDecimal multiplied = conversionFactor.multiply(tempFinalTokey).setScale(1, RoundingMode.HALF_UP);
+            BigDecimal multiplied = conversionFactor.multiply(tempFinalTokey).setScale(2, RoundingMode.HALF_UP);
             receipt.setFinalB3trToken(multiplied);
         });
         //获取CSV的数据列表

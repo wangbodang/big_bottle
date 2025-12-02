@@ -2,10 +2,8 @@ package com.vefuture.big_bottle.web.vefuture.strategy.llm.coze;
 
 import com.alibaba.fastjson.JSON;
 import com.vefuture.big_bottle.common.config.prop.BigBottleProperties;
-import com.vefuture.big_bottle.common.domain.ApiResponse;
 import com.vefuture.big_bottle.common.enums.ResultCode;
 import com.vefuture.big_bottle.common.exception.BusinessException;
-import com.vefuture.big_bottle.common.util.BlockUtils;
 import com.vefuture.big_bottle.common.util.OkHttpUtil;
 import com.vefuture.big_bottle.web.vefuture.service.IProcessLogService;
 import com.vefuture.big_bottle.web.vefuture.strategy.llm.LlmStrategy;
@@ -20,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 /**
@@ -53,10 +50,10 @@ public class CozeStrategy implements LlmStrategy {
             Long processLogId = processLogService.createLog(ipAddress,processId, walletAddress, imgUrl);
             //1 构造请求参数
             ParameterEntity parameterEntity = new ParameterEntity();
-            parameterEntity.setImg_url(imgUrl);
+            parameterEntity.setImgUrl(imgUrl);
             BodyEntity bodyEntity = new BodyEntity();
             bodyEntity.setWorkflow_id(bigBottleProperties.getCoze().getCoze_workflow_id());
-            bodyEntity.setParameters(parameterEntity);
+            bodyEntity.setInputs(parameterEntity);
 
             //2 使用 Gson（或 Jackson 等）将实体转换为 JSON 字符串
             String jsonString = JSON.toJSONString(bodyEntity);
